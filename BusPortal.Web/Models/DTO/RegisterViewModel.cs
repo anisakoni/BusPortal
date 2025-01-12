@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BusPortal.Web.Models
+namespace BusPortal.Web.Models.DTO
 {
     public class RegisterViewModel
     {

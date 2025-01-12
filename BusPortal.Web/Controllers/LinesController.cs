@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using BusPortal.Web.Models;
 using BusPortal.Web.Data;
 using BusPortal.Web.Models.Entities;
 using Microsoft.EntityFrameworkCore;
+using BusPortal.Web.Models.DTO;
 namespace BusPortal.Web.Controllers
 {
     public class LinesController : Controller

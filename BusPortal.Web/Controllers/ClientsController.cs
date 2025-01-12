@@ -1,5 +1,5 @@
 ﻿using BusPortal.Web.Data;
-using BusPortal.Web.Models;
+using BusPortal.Web.Models.DTO;
 using BusPortal.Web.Models.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

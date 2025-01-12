@@ -1,17 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using BusPortal.Web.Models.Entities;
+using BusPortal.DAL.Persistence.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-namespace BusPortal.Web.Data
+namespace BusPortal.DAL.Persistence
 {
-    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
+    public class DALDbContext : DbContext
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
+        public DALDbContext(DbContextOptions<DALDbContext> options) : base(options)
         {
 
         }
         public DbSet<Client> Clients { get; set; }
         public DbSet<Line> Lines { get; set; }
         public DbSet<Booking> Bookings { get; set; }
+        public DbSet<Payment> Payments { get; set; }
     }
 }

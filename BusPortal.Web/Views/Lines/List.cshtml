@@ -1,0 +1,48 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model List<BusPortal.Web.Models.Entities.Line>
+
+<h1> Lines</h1>
+<table class="table"> 
+    <thead> 
+        <tr>
+            <th>Start City</th>
+            <th>Destination City</th>
+            <th>Departure Time</th>
+            <th> </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var line in Model)
+        {
+            <tr>
+            <td>@line.StartCity</td>
+            <td>@line.DestinationCity</td>
+            <td>@line.DepartureTimes</td>
+            <td>
+                <a class="btn btn-primary" asp-controller="Lines" asp-action="Edit" asp-route-id="@line.Id">Edit</a>
+            </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<a class="btn btn-primary floating-btn" asp-action="Add" asp-controller="Lines">
+    Add Line
+</a>
+
+<style>
+    .floating-btn {
+        position: fixed;
+        bottom: 80px;
+        right: 20px;
+        z-index: 1000;
+        padding: 10px 20px;
+        font-size: 16px;
+        border-radius: 50px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+</style>

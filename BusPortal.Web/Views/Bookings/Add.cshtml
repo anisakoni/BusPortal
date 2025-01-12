@@ -1,0 +1,45 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model BusPortal.Web.Models.AddBookingViewModel
+
+@{
+    ViewData["Title"] = "Create Booking";
+}
+
+<h2>Create New Booking</h2>
+
+<form asp-action="Add" method="post">
+    <div class="form-group">
+        <label for="StartCity">Start City</label>
+        <input type="text" class="form-control" id="StartCity" name="StartCity" required />
+    </div>
+    <div class="form-group">
+        <label for="DestinationCity">Destination City</label>
+        <input type="text" class="form-control" id="DestinationCity" name="DestinationCity" required />
+    </div>
+    <div class="form-group">
+        <label for="Date">Date</label>
+        <input type="date" class="form-control" id="Date" name="Date" required />
+    </div>
+    <div class="form-group">
+        <label for="Time">Time</label>
+        <input type="time" class="form-control" id="Time" name="Time" required />
+    </div>
+    <div class="form-group">
+        <label for="Seat">Seat</label>
+        <input type="text" class="form-control" id="Seat" name="Seat" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Create Booking</button>
+</form>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success mt-3">
+        @TempData["SuccessMessage"]
+    </div>
+}

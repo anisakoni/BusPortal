@@ -1,4 +1,11 @@
 using BusPortal.BLL.Services;
+using BusPortal.BLL.Services.Interfaces;
+using BusPortal.Common.Models;
+using BusPortal.DAL.Persistence;
+using BusPortal.Web.Services;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +36,10 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+builder.Services.AddScoped<IClientService, ClientService>();
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+// Register AutoMapper with the profile in the DI container
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
 var app = builder.Build();
 

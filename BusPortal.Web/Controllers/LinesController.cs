@@ -1,87 +1,76 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using BusPortal.Web.Models.Entities;
-using Microsoft.EntityFrameworkCore;
-using BusPortal.Web.Models.DTO;
+﻿using BusPortal.BLL.Domain.Models;
+using BusPortal.BLL.Services.Interfaces;
+using BusPortal.Common.Models;
+using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
+
 namespace BusPortal.Web.Controllers
 {
     public class LinesController : Controller
     {
-        //    private readonly ApplicationDbContext dbContext;
-        //    public LinesController(ApplicationDbContext dbContext)
-        //    {
-        //        this.dbContext = dbContext; 
-        //    }
+        private readonly ILinesService _linesService;
 
-        //    [HttpGet]
-        //    public IActionResult Add()
-        //    {
-        //        return View();
-        //    }
+        public LinesController(ILinesService linesService)
+        {
+            _linesService = linesService ?? throw new ArgumentNullException(nameof(linesService));
+        }
 
-        //    [HttpPost]
-        //    public async Task<IActionResult> Add(AddLineViewModel viewModel)
-        //    {
-        //        var line = new Line {
-        //            StartCity = viewModel.StartCity,
-        //            DestinationCity = viewModel.DestinationCity,
-        //            DepartureTimes = viewModel.DepartureTimes,
-        //        };
+        [HttpGet]
+        public IActionResult Add()
+        {
+            return View();
+        }
 
-        //        await dbContext.Lines.AddAsync(line);
+        [HttpPost]
+        public async Task<IActionResult> Add(AddLineViewModel viewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                await _linesService.AddLineAsync(viewModel);
+                return RedirectToAction("List");
+            }
 
-        //        await dbContext.SaveChangesAsync();
+            return View(viewModel);
+        }
 
-        //        return RedirectToAction("List", "Lines");
-        //    }
+        [HttpGet]
+        public async Task<IActionResult> List()
+        {
+            var lines = await _linesService.GetAllLinesAsync();
+            return View(lines);
+        }
 
-        //    [HttpGet]
-        //    public async Task<IActionResult> List()
-        //    {
-        //        var lines = await dbContext.Lines.ToListAsync();
+        [HttpGet]
+        public async Task<IActionResult> Edit(Guid id)
+        {
+            var line = await _linesService.GetLineByIdAsync(id);
 
-        //        return View(lines);
+            if (line == null)
+            {
+                return NotFound();
+            }
 
-        //    }
+            return View(line);
+        }
 
-        //    [HttpGet]
-        //    public async Task<IActionResult> Edit(Guid id)
-        //    {
-        //        var line = await dbContext.Lines.FindAsync(id);
+        [HttpPost]
+        public async Task<IActionResult> Edit(Line viewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                await _linesService.UpdateLineAsync(viewModel);
+                return RedirectToAction("List");
+            }
 
-        //        return View(line);
+            return View(viewModel);
+        }
 
-        //    }
-
-        //    [HttpPost]
-        //    public async Task<IActionResult> Edit(Line viewModel)
-        //    {
-        //        var line = await dbContext.Lines
-        //                        .AsNoTracking()
-        //                        .FirstOrDefaultAsync(x => x.Id == viewModel.Id);
-        //        if (line is not null)
-        //        {
-
-        //            line.StartCity = viewModel.StartCity;
-        //            line.DestinationCity = viewModel.DestinationCity;
-        //            line.DepartureTimes = viewModel.DepartureTimes;
-
-        //            await dbContext.SaveChangesAsync();
-        //        }
-        //        return RedirectToAction("List", "Lines");
-        //    }
-
-        //    [HttpPost]
-        //    public async Task<IActionResult> Delete(Line viewModel)
-        //    {
-        //        var line = await dbContext.Lines.FindAsync(viewModel.Id);
-
-        //        if (line is not null)
-        //        {
-        //            dbContext.Lines.Remove(line);
-        //            await dbContext.SaveChangesAsync();
-        //        }
-        //        return RedirectToAction("List", "Lines");
-        //    }
-    
+        [HttpPost]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            await _linesService.DeleteLineAsync(id);
+            return RedirectToAction("List");
+        }
     }
 }

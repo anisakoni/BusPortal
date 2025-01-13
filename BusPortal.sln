@@ -5,13 +5,18 @@ VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusPortal.Web", "BusPortal.Web\BusPortal.Web.csproj", "{52F797E9-D352-4723-AF0C-75E7DCDB4B6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusPortal.BLL", "BusPortal.BLL\BusPortal.BLL.csproj", "{FAD0DECE-52C9-4500-B230-B7DE8E41BA70}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusPortal.BLL", "BusPortal.BLL\BusPortal.BLL.csproj", "{FAD0DECE-52C9-4500-B230-B7DE8E41BA70}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusPortal.DAL", "BusPortal.DAL\BusPortal.DAL.csproj", "{A216B79A-47B8-48AE-9466-314CFBF3EFFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusPortal.DAL", "BusPortal.DAL\BusPortal.DAL.csproj", "{A216B79A-47B8-48AE-9466-314CFBF3EFFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusPortal.Domain", "BusPortal.Domain\BusPortal.Domain.csproj", "{92FFA278-1E5F-436D-937F-D97AD568ABEF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusPortal.Domain", "BusPortal.Domain\BusPortal.Domain.csproj", "{92FFA278-1E5F-436D-937F-D97AD568ABEF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusPortal.Common", "BusPortal.Common\BusPortal.Common.csproj", "{E78EFAE2-EE26-4A84-BBD8-844D0E18B96F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusPortal.Common", "BusPortal.Common\BusPortal.Common.csproj", "{E78EFAE2-EE26-4A84-BBD8-844D0E18B96F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{32C9D500-E65C-44CE-9C29-34A25F34F5AA}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,69 +1,60 @@
-﻿
-using BusPortal.Web.Models;
-using BusPortal.Web.Models.Entities;
+﻿using BusPortal.BLL.Services.Scoped;
 using Microsoft.AspNetCore.Mvc;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BusPortal.Web.Controllers
 {
     public class BookingsController : Controller
     {
-        //    private readonly ApplicationDbContext dbContext;
-        //    public BookingsController(ApplicationDbContext dbContext)
-        //    {
-        //        this.dbContext = dbContext;
-        //    }
-        //    [HttpGet]
-        //    public IActionResult Add()
-        //    {
-        //        return View();
-        //    }
+        private readonly IBookingServices _bookingServices;
 
-        //    [HttpPost]
-        //    [ValidateAntiForgeryToken]
-        //    public IActionResult Add(AddBookingViewModel viewModel)
-        //    {
-        //        if (ModelState.IsValid)
-        //        {
-        //        var user = User.Identity.Name; 
-        //            if(user == null)
-        //            {
-        //                TempData["ErrorMessage"] = "User identity not found.";
-        //                return View();
-        //            }
-        //        var client = dbContext.Clients.FirstOrDefault(c => c.Name == user);
-        //        if (client == null)
-        //        {
-        //            TempData["ErrorMessage"] = "Client not found for the logged-in user.";
-        //            return View();
-        //        }
+        public BookingsController(IBookingServices bookingServices)
+        {
+            _bookingServices = bookingServices;
+        }
 
-        //        var line = dbContext.Lines.FirstOrDefault(l => l.StartCity == viewModel.StartCity && l.DestinationCity == viewModel.DestinationCity);
+        [HttpGet]
+        public IActionResult Add()
+        {
+            return View();
+        }
 
-        //        if (line != null)
-        //        { 
-        //            var booking = new Booking
-        //            {
-        //                Id = Guid.NewGuid(),
-        //                Client = client,
-        //                Line = line,
-        //                DateTime = viewModel.Date.Add(viewModel.Time), 
-        //                Seat = viewModel.Seat
-        //            };
-        //                dbContext.Bookings.Add(booking);
-        //                dbContext.SaveChanges();
-        //            }
-        //            else
-        //            {
-        //                TempData["ErrorMessage"] = "The specified route does not exist.";
-        //                return View();
-        //            }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Add(BusPortal.Web.Models.DTO.AddBookingViewModel viewModel)
 
-        //            TempData["SuccessMessage"] = "Booking created successfully!";
-        //            return RedirectToAction("Add");
+        {
+            if (ModelState.IsValid)
+            {
+                var userName = User.Identity.Name;
 
-        //        }
-        //        return View(viewModel);
-        //    }
+                if (userName == null)
+                {
+                    TempData["ErrorMessage"] = "User identity not found.";
+                    return View(viewModel);
+                }
+
+                var commonViewModel = new BusPortal.Common.Models.AddBookingViewModel
+                {
+                    StartCity = viewModel.StartCity,
+                    DestinationCity = viewModel.DestinationCity,
+                    Date = viewModel.Date,
+                    Time = viewModel.Time,
+                    Seat = viewModel.Seat
+                };
+
+                var result = _bookingServices.AddBooking(commonViewModel, userName);
+
+                if (!result.Success)
+                {
+                    TempData["ErrorMessage"] = result.ErrorMessage;
+                    return View(viewModel);
+                }
+
+                TempData["SuccessMessage"] = "Booking created successfully!";
+                return RedirectToAction("Add");
+            }
+
+            return View(viewModel);
+        }
     }
 }

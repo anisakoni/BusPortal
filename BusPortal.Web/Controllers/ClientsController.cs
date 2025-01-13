@@ -1,176 +1,95 @@
-﻿using BusPortal.Web.Models.DTO;
-using BusPortal.Web.Models.Entities;
-using Microsoft.AspNetCore.Identity;
+﻿using AutoMapper; 
+using BusPortal.BLL.Services.Interfaces;
+using BusPortal.Common.Models;
+using BusPortal.Web.Models.DTO; 
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Reflection;
+using System.Threading.Tasks;
 
 namespace BusPortal.Web.Controllers
 {
     public class ClientsController : Controller
     {
-    //    private readonly ApplicationDbContext dbContext;
-    //    private readonly UserManager<IdentityUser> _userManager;
-    //    private readonly SignInManager<IdentityUser> _signInManager;
-    //    public ClientsController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager, ApplicationDbContext dbContext)
-    //    {
-    //        this.dbContext = dbContext;
-    //        _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
-    //        _signInManager = signInManager ?? throw new ArgumentNullException(nameof(signInManager));
+        private readonly IClientService _clientService;
+        private readonly IMapper _mapper;  
 
-    //    }
+        public ClientsController(IClientService clientService, IMapper mapper)
+        {
+            _clientService = clientService ?? throw new ArgumentNullException(nameof(clientService));
+            _mapper = mapper; // Initialize AutoMapper
+        }
 
-    //    [HttpGet]
-    //    public IActionResult Login()  
-    //    { 
-    //        return View(); 
-    //    }
+        // GET Register
+        [HttpGet]
+        public IActionResult Register()
+        {
+          
+            var registerViewModel = new BusPortal.Common.Models.RegisterViewModel();
 
-    //    [HttpPost]
-    //    public async Task<IActionResult> Login(LoginViewModel viewModel)
-    //    {
-    //        if (ModelState.IsValid)
-    //        {
-    //            var result = await _signInManager.PasswordSignInAsync(viewModel.Username, viewModel.Password, isPersistent: false, lockoutOnFailure: false);
-    //            var user = await dbContext.Clients.FirstOrDefaultAsync(u => u.Name == viewModel.Username);
-    //            if (result.Succeeded)
-    //            {
-    //                if(user != null)
-    //                {
-    //                    if (user.Admin == true)
-    //                    {
-    //                        TempData["SuccessMessage"] = "Login successful!";
-    //                        return RedirectToAction("List", "Lines");
-    //                    }
-    //                    else
-    //                    {
-    //                        TempData["SuccessMessage"] = "Login successful!";
-    //                        return RedirectToAction("Add", "Bookings");
-    //                    }
-    //                }
-    //                else
-    //                {
-    //                    TempData["ErrorMessage"] = "Client entity not found";
-    //                }
-                    
-                    
-    //            }
+           
+            var dtoModel = _mapper.Map<BusPortal.Web.Models.DTO.RegisterViewModel>(registerViewModel);
 
-    //            TempData["ErrorMessage"] = "Invalid login attempt.";
-    //        }
+            return View(dtoModel);  
+        }
 
-    //        return View(viewModel);
-    //    }
+        // POST Register
+        [HttpPost]
+        public async Task<IActionResult> Register(BusPortal.Web.Models.DTO.RegisterViewModel viewModel)
+        {
+            if (ModelState.IsValid)
+            {
+               
+                var commonModel = _mapper.Map<BusPortal.Common.Models.RegisterViewModel>(viewModel);
 
-    //    [HttpGet]
-    //    public IActionResult Register()
-    //    {
-    //        return View();
-    //    }
+                var result = await _clientService.RegisterClient(commonModel);
+                if (result)
+                {
+                    TempData["SuccessMessage"] = "Registration successful!";
+                    return RedirectToAction("Login");
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "A client with this email already exists.";
+                }
+            }
 
-    //    [HttpPost]
-    //    public async Task<IActionResult> Register(RegisterViewModel viewModel)
-    //    {
-    //        if (ModelState.IsValid)
-    //        {
-    //            var user = new IdentityUser
-    //            {
-    //                UserName = viewModel.Name,
-    //                Email = viewModel.Email
-    //            };
+            return View(viewModel); 
+        }
 
-    //            var result = await _userManager.CreateAsync(user, viewModel.Password);
+        // GET Login
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
 
-    //            if (result.Succeeded)
-    //            {
-    //                var newUser = new Client
-    //                {
-    //                    Id = Guid.NewGuid(),
-    //                    Name = viewModel.Name,
-    //                    Email = viewModel.Email,
-    //                    Admin = false,
-    //                };
-    //                await dbContext.Clients.AddAsync(newUser);
-    //                await dbContext.SaveChangesAsync();
+        // POST Login
+        [HttpPost]
+        public async Task<IActionResult> Login(Common.Models.LoginViewModel viewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                var isAuthenticated = await _clientService.AuthenticateClient(viewModel);
+                if (isAuthenticated)
+                {
+                    TempData["SuccessMessage"] = "Login successful!";
+                  
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Invalid username or password.";
+                }
+            }
 
-    //                TempData["SuccessMessage"] = "Registration successful!";
-    //                return RedirectToAction("Add", "Bookings");
-    //            }
+            return View(viewModel); 
+        }
 
-    //            foreach (var error in result.Errors)
-    //            {
-    //                ModelState.AddModelError(string.Empty, error.Description);
-    //            }
-    //        }
-
-    //        return View(viewModel);
-    //    }
-
-    //    public async Task<IActionResult> Logout()
-    //    {
-    //        await _signInManager.SignOutAsync();
-    //        return RedirectToAction("Index", "Home");
-    //    }
-
-        //[HttpGet]
-        //public IActionResult Register()
-        //{
-        //    return View();
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> Register(string name, string email, string password, string confirmPassword)
-        //{
-        //    var existingUser = await dbContext.Clients.FirstOrDefaultAsync(u => u.Email == email);
-        //    if (existingUser != null)
-        //    {
-        //        TempData["ErrorMessage"] = "An account with this email already exists.";
-        //        return View();
-        //    }
-
-
-        //    var newUser = new Client
-        //    {
-        //        Id = Guid.NewGuid(),
-        //        Name = name,
-        //        Email = email,
-        //        Admin = false
-        //    };
-
-
-        //    await dbContext.Clients.AddAsync(newUser);
-
-        //    await dbContext.SaveChangesAsync();
-
-        //    return RedirectToAction("Add", "Bookings");
-        //}
-
-        
-
-        //[HttpGet]
-        //public IActionResult Login()
-        //{
-        //    return View();
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> Login(string email, string password)
-        //{
-        //    var user = await dbContext.Clients.FirstOrDefaultAsync(u => u.Email == email);
-
-        //    if (user == null)
-        //    {
-        //        TempData["ErrorMessage"] = "Invalid email or password.";
-        //        return View();
-        //    }
-
-        //    if (user.Admin == true)
-        //    {
-        //        return RedirectToAction("List", "Lines");
-        //    }
-        //    return RedirectToAction("Add", "Bookings");
-        //}
-
-
+    
+        public async Task<IActionResult> Logout()
+        {
+            await _clientService.Logout();
+            TempData["SuccessMessage"] = "You have been logged out.";
+            return RedirectToAction("Login");
+        }
     }
 }

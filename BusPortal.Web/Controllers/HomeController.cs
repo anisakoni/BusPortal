@@ -1,4 +1,5 @@
 using BusPortal.Web.Models;
+using BusPortal.Web.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 

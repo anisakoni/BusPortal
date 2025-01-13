@@ -1,6 +1,6 @@
 ﻿namespace BusPortal.DAL.Persistence.Entities
 {
-    public class Client
+    public class Client : BaseEntity<Guid>
     {
         public Guid Id { get; set; }
         public string Name{ get; set; }

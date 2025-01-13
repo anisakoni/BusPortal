@@ -1,6 +1,6 @@
 ﻿namespace BusPortal.DAL.Persistence.Entities
 {
-    public class Booking
+    public class Booking : BaseEntity<Guid>
     {
         public Guid Id { get; set; }
         public required Client Client { get; set; }

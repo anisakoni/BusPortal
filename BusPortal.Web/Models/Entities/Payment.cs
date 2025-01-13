@@ -1,7 +1,6 @@
-﻿using NuGet.Packaging.Signing;
-namespace BusPortal.DAL.Persistence.Entities
+﻿namespace BusPortal.DAL.Persistence.Entities
 {
-    public class Payment : BaseEntity<Guid>
+    public class Payment
     {
         public Guid Id { get; set; }
         public int amount { get; set; }

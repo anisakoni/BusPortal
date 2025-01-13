@@ -1,4 +1,4 @@
-namespace BusPortal.Web.Models.DTO
+namespace BusPortal.Web.Models
 {
     public class ErrorViewModel
     {

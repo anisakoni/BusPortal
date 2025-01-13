@@ -1,6 +1,4 @@
-﻿using BusPortal.Web.Models.Entities;
-
-namespace BusPortal.Web.Models.DTO
+﻿namespace BusPortal.Web.Models.DTO
 {
     public class AddBookingViewModel
     {

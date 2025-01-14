@@ -1,6 +1,7 @@
 using BusPortal.BLL.Services;
 using BusPortal.BLL.Services.Interfaces;
 using BusPortal.Common.Models;
+using BusPortal.DAL;
 using BusPortal.DAL.Persistence;
 using BusPortal.Web.Services;
 using Microsoft.AspNetCore.Identity;
@@ -13,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.RegisterBLLServices(builder.Configuration);
+//builder.Services.RegisterDALServices(builder.Configuration);
 
 //builder.Services.AddDbContext<DALDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("BusPortal")));
 

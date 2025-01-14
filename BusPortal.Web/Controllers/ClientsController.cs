@@ -1,9 +1,6 @@
 ﻿using AutoMapper; 
 using BusPortal.BLL.Services.Interfaces;
-using BusPortal.Common.Models;
-using BusPortal.Web.Models.DTO; 
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 namespace BusPortal.Web.Controllers
 {
@@ -15,10 +12,10 @@ namespace BusPortal.Web.Controllers
         public ClientsController(IClientService clientService, IMapper mapper)
         {
             _clientService = clientService ?? throw new ArgumentNullException(nameof(clientService));
-            _mapper = mapper; // Initialize AutoMapper
+            _mapper = mapper;
         }
 
-        // GET Register
+        
         [HttpGet]
         public IActionResult Register()
         {
@@ -31,7 +28,7 @@ namespace BusPortal.Web.Controllers
             return View(dtoModel);  
         }
 
-        // POST Register
+        
         [HttpPost]
         public async Task<IActionResult> Register(BusPortal.Web.Models.DTO.RegisterViewModel viewModel)
         {
@@ -55,25 +52,26 @@ namespace BusPortal.Web.Controllers
             return View(viewModel); 
         }
 
-        // GET Login
+        
         [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
 
-        // POST Login
+        
         [HttpPost]
-        public async Task<IActionResult> Login(Common.Models.LoginViewModel viewModel)
+        public async Task<IActionResult> Login(BusPortal.Web.Models.DTO.LoginViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
-                var isAuthenticated = await _clientService.AuthenticateClient(viewModel);
+                var commonModel = _mapper.Map<BusPortal.Common.Models.LoginViewModel>(viewModel);
+                var isAuthenticated = await _clientService.AuthenticateClient(commonModel);
                 if (isAuthenticated)
                 {
                     TempData["SuccessMessage"] = "Login successful!";
                   
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Privacy", "Home");
                 }
                 else
                 {

@@ -22,4 +22,5 @@ namespace BusPortal.Web.Models.DTO
         [Compare("Password", ErrorMessage = "Passwords do not match.")]
         public string ConfirmPassword { get; set; }
     }
+
 }

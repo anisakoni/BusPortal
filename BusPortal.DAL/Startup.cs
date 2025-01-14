@@ -1,4 +1,8 @@
 ﻿using BusPortal.DAL.Persistence;
+using BusPortal.DAL.Persistence.Entities;
+
+using Microsoft.AspNetCore.Identity;
+
 //using BusPortal.DAL.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +18,10 @@ public static class Startup
         {
             opt.UseSqlServer(config.GetConnectionString("BusPortal"));
         });
+
+        services.AddIdentity<ApplicationUser, IdentityRole>()
+           .AddEntityFrameworkStores<DALDbContext>()
+           .AddDefaultTokenProviders();
         //services.AddScoped<ICarBrandsRepository, CarBrandsRepository>();
     }
 }

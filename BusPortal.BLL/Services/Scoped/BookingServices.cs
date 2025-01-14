@@ -2,14 +2,8 @@
 using BusPortal.DAL.Persistence.Entities;
 using BusPortal.Common.Models;
 
-
 namespace BusPortal.BLL.Services.Scoped
 {
-    public interface IBookingServices
-    {
-        (bool Success, string? ErrorMessage) AddBooking(AddBookingViewModel viewModel, string userName);
-    }
-
     public class BookingServices : IBookingServices
     {
         private readonly DALDbContext _dbContext;

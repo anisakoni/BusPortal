@@ -16,7 +16,7 @@ public static class Startup
     {
         services.RegisterDALServices(config);
         services.AddScoped<ILinesService, LinesService>();
-        services.AddScoped<IBookingServices, BookingServices>();
+        //services.AddScoped<IBookingServices, BookingServices>();
         services.AddScoped<IClientService, ClientService>();
 
         //services.AddScoped<ILoginServices, LoginServices>();

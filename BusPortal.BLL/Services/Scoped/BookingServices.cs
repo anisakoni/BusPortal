@@ -2,6 +2,7 @@
 using BusPortal.DAL.Persistence.Repositories;
 using BusPortal.Common.Models;
 using System;
+using BusPortal.BLL.Services.Interfaces;
 
 namespace BusPortal.BLL.Services.Scoped
 {

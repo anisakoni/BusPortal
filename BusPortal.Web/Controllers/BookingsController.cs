@@ -1,5 +1,6 @@
 ﻿using BusPortal.BLL.Services.Scoped;
 using Microsoft.AspNetCore.Mvc;
+using BusPortal.BLL.Services.Interfaces;
 
 namespace BusPortal.Web.Controllers
 {

@@ -1,29 +1,37 @@
-﻿using BusPortal.DAL.Persistence;
-using BusPortal.DAL.Persistence.Entities;
+﻿using BusPortal.DAL.Persistence.Entities;
+using BusPortal.DAL.Persistence.Repositories;
 using BusPortal.Common.Models;
+using System;
 
 namespace BusPortal.BLL.Services.Scoped
 {
     public class BookingServices : IBookingServices
     {
-        private readonly DALDbContext _dbContext;
+        private readonly IBookingRepository _bookingRepository;
+        private readonly IClientRepository _clientRepository;
+        private readonly ILineRepository _lineRepository;
 
-        public BookingServices(DALDbContext dbContext)
+        public BookingServices(
+            IBookingRepository bookingRepository,
+            IClientRepository clientRepository,
+            ILineRepository lineRepository)
         {
-            _dbContext = dbContext;
+            _bookingRepository = bookingRepository;
+            _clientRepository = clientRepository;
+            _lineRepository = lineRepository;
         }
 
         public (bool Success, string? ErrorMessage) AddBooking(AddBookingViewModel viewModel, string userName)
         {
             try
             {
-                var client = _dbContext.Clients.FirstOrDefault(c => c.Name == userName);
+                var client = _clientRepository.GetAll().FirstOrDefault(c => c.Name == userName);
                 if (client == null)
                 {
                     return (false, "Client not found for the logged-in user.");
                 }
 
-                var line = _dbContext.Lines.FirstOrDefault(l => l.StartCity == viewModel.StartCity && l.DestinationCity == viewModel.DestinationCity);
+                var line = _lineRepository.GetAll().FirstOrDefault(l => l.StartCity == viewModel.StartCity && l.DestinationCity == viewModel.DestinationCity);
                 if (line == null)
                 {
                     return (false, "The specified route does not exist.");
@@ -38,9 +46,7 @@ namespace BusPortal.BLL.Services.Scoped
                     Seat = viewModel.Seat
                 };
 
-                _dbContext.Bookings.Add(booking);
-                _dbContext.SaveChanges();
-
+                _bookingRepository.Add(booking);
                 return (true, null);
             }
             catch (Exception ex)

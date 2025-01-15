@@ -82,12 +82,11 @@ namespace BusPortal.Web.Controllers
             return View(viewModel); 
         }
 
-    
-        public async Task<IActionResult> Logout()
+
+        public IActionResult Logout()
         {
-            await _clientService.Logout();
-            TempData["SuccessMessage"] = "You have been logged out.";
-            return RedirectToAction("Login");
+            _clientService.Logout();
+            return RedirectToAction("Login", "Clients");
         }
     }
 }

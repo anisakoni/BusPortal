@@ -5,25 +5,20 @@ using BusPortal.DAL;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace BusPortal.BLL.Services;
-
-public static class Startup
+namespace BusPortal.BLL.Services
 {
-    public static void RegisterBLLServices(this IServiceCollection services, IConfiguration config)
+    public static class Startup
     {
-        services.RegisterDALServices(config);
-        services.AddScoped<ILinesService, LinesService>();
-        //services.AddScoped<IBookingServices, BookingServices>();
-        services.AddScoped<IClientService, ClientService>();
+        public static void RegisterBLLServices(this IServiceCollection services, IConfiguration config)
+        {
+            services.RegisterDALServices(config);
 
+            services.AddScoped<ILinesService, LinesService>();
+            services.AddScoped<IBookingServices, BookingServices>();
+            services.AddScoped<IClientService, ClientService>();
 
-
+            
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        }
     }
-    public static void ConfigureServices(IServiceCollection services)
-    {
-       
-        services.AddAutoMapper(typeof(MappingProfile));
-    }
-
-
 }

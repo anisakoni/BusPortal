@@ -1,73 +1,71 @@
 ﻿using AutoMapper;
 using BusPortal.BLL.Services.Interfaces;
 using BusPortal.Common.Models;
-using BusPortal.DAL.Persistence;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
-using System.Text;
+using BusPortal.DAL.Persistence.Entities;
+using BusPortal.DAL.Persistence.Repositories;
+using Microsoft.AspNetCore.Identity; // For PasswordHasher
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
-public class ClientService : IClientService
+namespace BusPortal.BLL.Services
 {
-    private readonly DALDbContext _dbContext;
-    private readonly IMapper _mapper;
-
-    public ClientService(DALDbContext dbContext, IMapper mapper)
+    public class ClientService : IClientService
     {
-        _dbContext = dbContext;
-        _mapper = mapper;
-    }
+        private readonly IClientRepository _clientRepository;
+        private readonly IMapper _mapper;
+        private readonly IPasswordHasher<Client> _passwordHasher;
 
-    public async Task<bool> AuthenticateClient(LoginViewModel viewModel)
-    {
-       
-        var client = await _dbContext.Clients.FirstOrDefaultAsync(c => c.Email == viewModel.Username);
-        if (client == null)
+        public ClientService(IClientRepository clientRepository, IMapper mapper, IPasswordHasher<Client> passwordHasher)
         {
-            return false; 
+            _clientRepository = clientRepository ?? throw new ArgumentNullException(nameof(clientRepository));
+            _mapper = mapper;
+            _passwordHasher = passwordHasher ?? throw new ArgumentNullException(nameof(passwordHasher));
         }
 
-        
-        if (VerifyPassword(viewModel.Password, client.Password))
+        public async Task<bool> RegisterClient(RegisterViewModel model)
         {
-            return true; 
+            var clientEntity = _mapper.Map<Client>(model);
+
+            // Check if the client already exists
+            var existingClient = _clientRepository.GetAll().FirstOrDefault(c => c.Email == clientEntity.Email);
+            if (existingClient != null)
+            {
+                return false; // Client already exists
+            }
+
+            // Hash the password before storing it
+            clientEntity.Password = _passwordHasher.HashPassword(clientEntity, model.Password);
+
+            // Add the client to the repository
+            _clientRepository.Add(clientEntity);
+            _clientRepository.SaveChanges();
+            return true;
         }
 
-        return false; 
-    }
-    }
-
-    public async Task<bool> RegisterClient(RegisterViewModel viewModel)
-    {
-       
-        var existingClient = await _dbContext.Clients.FirstOrDefaultAsync(u => u.Email == viewModel.Email);
-        if (existingClient != null)
+        public async Task<bool> AuthenticateClient(LoginViewModel model)
         {
-            return false; 
+            // Find the client by email
+            var clientEntity = _clientRepository.GetAll().FirstOrDefault(c => c.Email == model.Email);
+            if (clientEntity == null)
+            {
+                return false; // Client does not exist
+            }
+
+            // Verify the password hash
+            var result = _passwordHasher.VerifyHashedPassword(clientEntity, clientEntity.Password, model.Password);
+            if (result == PasswordVerificationResult.Failed)
+            {
+                return false; // Invalid password
+            }
+
+            return true;
         }
 
-        var newClientBLL = new BusPortal.BLL.Domain.Models.Client
+        public Task Logout()
         {
-            Id = Guid.NewGuid(),
-            Name = viewModel.Name,
-            Email = viewModel.Email,
-            Password = HashPassword(viewModel.Password), 
-            Admin = false 
-        };
-
-        var newClientDAL = _mapper.Map<BusPortal.DAL.Persistence.Entities.Client>(newClientBLL);
-
-        
-        await _dbContext.Clients.AddAsync(newClientDAL);
-        await _dbContext.SaveChangesAsync();
-
-        return true; 
-    }
-
-    private string HashPassword(string password)
-    {
-        using var sha256 = SHA256.Create();
-        var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-        return Convert.ToBase64String(hashedBytes);
-    }
+            // Logout logic to be implemented
+            throw new NotImplementedException();
+        }
     }
 }

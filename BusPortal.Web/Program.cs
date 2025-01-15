@@ -7,7 +7,6 @@ using BusPortal.DAL.Persistence.Entities;
 using BusPortal.BLL.Services.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
- 
 builder.Services.AddControllersWithViews();
 
 

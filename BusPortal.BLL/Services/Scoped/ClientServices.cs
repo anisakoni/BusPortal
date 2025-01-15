@@ -34,7 +34,6 @@ namespace BusPortal.BLL.Services
                 return false; // Client already exists
             }
 
-            // Hash the password before storing it
             clientEntity.Password = _passwordHasher.HashPassword(clientEntity, model.Password);
 
             // Add the client to the repository

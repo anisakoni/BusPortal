@@ -2,8 +2,6 @@
 using BusPortal.DAL.Persistence.Entities;
 
 using Microsoft.AspNetCore.Identity;
-
-//using BusPortal.DAL.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,10 +1,7 @@
 ﻿using BusPortal.BLL.Mapping;
 using BusPortal.BLL.Services.Interfaces;
 using BusPortal.BLL.Services.Scoped;
-using BusPortal.Common.Models;
 using BusPortal.DAL;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,7 +16,6 @@ public static class Startup
         //services.AddScoped<IBookingServices, BookingServices>();
         services.AddScoped<IClientService, ClientService>();
 
-        //services.AddScoped<ILoginServices, LoginServices>();
 
 
     }

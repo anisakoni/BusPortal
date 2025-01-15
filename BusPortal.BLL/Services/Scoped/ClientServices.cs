@@ -34,11 +34,6 @@ public class ClientService : IClientService
 
         return false; 
     }
-
-    public Task Logout()
-    {
-        // Implement logout logic 
-        return Task.CompletedTask;
     }
 
     public async Task<bool> RegisterClient(RegisterViewModel viewModel)
@@ -50,7 +45,6 @@ public class ClientService : IClientService
             return false; 
         }
 
-      
         var newClientBLL = new BusPortal.BLL.Domain.Models.Client
         {
             Id = Guid.NewGuid(),
@@ -60,7 +54,6 @@ public class ClientService : IClientService
             Admin = false 
         };
 
-       
         var newClientDAL = _mapper.Map<BusPortal.DAL.Persistence.Entities.Client>(newClientBLL);
 
         
@@ -76,9 +69,5 @@ public class ClientService : IClientService
         var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
         return Convert.ToBase64String(hashedBytes);
     }
-
-    private bool VerifyPassword(string inputPassword, string storedHashedPassword)
-    {
-        return HashPassword(inputPassword) == storedHashedPassword;
     }
 }

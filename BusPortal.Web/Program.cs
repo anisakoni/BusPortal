@@ -5,7 +5,11 @@ using AutoMapper;
 using BusPortal.BLL.Mapping;
 using BusPortal.DAL.Persistence.Entities;
 using BusPortal.BLL.Services.Interfaces;
+using BusPortal.BLL.Services.Scoped;
+using BusPortal.DAL.Persistence.Repositories;
+using BusPortal.Web.Controllers;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddScoped<AccountController>();
 
 builder.Services.AddControllersWithViews();
 
@@ -28,9 +32,17 @@ builder.Services.AddSession(options =>
 
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+//builder.Services.AddScoped<IPasswordHasher<Client>, PasswordHasher<Client>>();
+//builder.Services.AddScoped<IClientService, ClientService>();
+//builder.Services.AddControllersWithViews();
+//builder.Services.AddScoped<ILinesService, LinesService>();
+//builder.Services.AddScoped(typeof(_IBaseRepository<,>), typeof(_IBaseRepository<,>));
 builder.Services.AddScoped<IPasswordHasher<Client>, PasswordHasher<Client>>();
 builder.Services.AddScoped<IClientService, ClientService>();
-builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<ILinesService, LinesService>();
+//builder.Services.AddScoped(typeof(_IBaseRepository<,>), typeof(_BaseRepository<,>));
+
+
 
 var app = builder.Build();
 

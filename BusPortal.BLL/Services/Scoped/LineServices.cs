@@ -1,3 +1,7 @@
+﻿using BusPortal.BLL.Services.Interfaces;
+using BusPortal.Common.Models;
+using BusPortal.DAL.Persistence.Entities;
+using BusPortal.DAL.Persistence.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -6,11 +10,11 @@ namespace BusPortal.BLL.Services.Scoped
 {
     public class LinesService : ILinesService
     {
-        private readonly DALDbContext _dbContext;
+        private readonly ILineRepository _lineRepository;
 
-        public LinesService(DALDbContext dbContext)
+        public LinesService(ILineRepository lineRepository)
         {
-            _dbContext = dbContext;
+            _lineRepository = lineRepository ?? throw new ArgumentNullException(nameof(lineRepository));
         }
 
         public async Task AddLineAsync(AddLineViewModel viewModel)
@@ -23,23 +27,23 @@ namespace BusPortal.BLL.Services.Scoped
                 DepartureTimes = viewModel.DepartureTimes,
             };
 
-            await _dbContext.Lines.AddAsync(line);
-            await _dbContext.SaveChangesAsync();
+            await _lineRepository.AddAsync(line);
+            await _lineRepository.SaveChangesAsync(); 
         }
 
         public async Task<List<Line>> GetAllLinesAsync()
         {
-            return await _dbContext.Lines.ToListAsync();
+            return await _lineRepository.GetAllAsync(); 
         }
 
         public async Task<Line> GetLineByIdAsync(Guid id)
         {
-            return await _dbContext.Lines.FindAsync(id);
+            return await _lineRepository.GetByIdAsync(id); 
         }
 
         public async Task UpdateLineAsync(Line viewModel)
         {
-            var line = await _dbContext.Lines.FindAsync(viewModel.Id);
+            var line = await _lineRepository.GetByIdAsync(viewModel.Id);
 
             if (line != null)
             {
@@ -47,22 +51,23 @@ namespace BusPortal.BLL.Services.Scoped
                 line.DestinationCity = viewModel.DestinationCity;
                 line.DepartureTimes = viewModel.DepartureTimes;
 
-                _dbContext.Lines.Update(line);
-                await _dbContext.SaveChangesAsync();
+                _lineRepository.Update(line); 
+                await _lineRepository.SaveChangesAsync();
             }
         }
 
         public async Task DeleteLineAsync(Guid id)
         {
-            var line = await _dbContext.Lines.FindAsync(id);
+            var line = await _lineRepository.GetByIdAsync(id);
 
             if (line != null)
             {
-                _dbContext.Lines.Remove(line);
-                await _dbContext.SaveChangesAsync();
+                _lineRepository.Remove(line); 
+                await _lineRepository.SaveChangesAsync();
             }
         }
 
+       
         Task<List<Domain.Models.Line>> ILinesService.GetAllLinesAsync()
         {
             throw new NotImplementedException();

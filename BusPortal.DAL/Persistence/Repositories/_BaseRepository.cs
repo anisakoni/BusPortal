@@ -13,26 +13,26 @@ namespace BusPortal.DAL.Persistence.Repositories
     internal class _BaseRepository<T, T1> : _IBaseRepository<T, T1> where T : BaseEntity<T1>
     {
         private  DALDbContext _dbContext;
-        protected DbSet<T> _dbSet;
+        protected DbSet<T> DbContext;
         public _BaseRepository(DALDbContext dbContext)
         {
             _dbContext = dbContext;
-            _dbSet = dbContext.Set<T>();
+            DbContext = dbContext.Set<T>();
         }
 
         public void Add(T entity)
         {
-            _dbSet.Add(entity);
+            DbContext.Add(entity);
         }
 
         public IEnumerable<T> GetAll()
         {
-            return [.. _dbSet.AsNoTracking()];
+            return [.. DbContext.AsNoTracking()];
         }
 
         public T GetById(T1 id)
         {
-            return _dbSet.Find(id);
+            return DbContext.Find(id);
         }
 
         public void SaveChanges()

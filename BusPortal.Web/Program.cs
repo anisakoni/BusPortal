@@ -7,12 +7,14 @@ using BusPortal.DAL.Persistence;
 using BusPortal.DAL.Persistence.Repositories;
 using BusPortal.Web.Services;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using System.Configuration;
-
+using AutoMapper;
+using BusPortal.BLL.Mapping;
+using BusPortal.DAL.Persistence.Entities;
+using BusPortal.BLL.Services.Interfaces;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
+
 
 builder.Services.RegisterBLLServices(builder.Configuration);
 
@@ -29,6 +31,10 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddScoped<IPasswordHasher<Client>, PasswordHasher<Client>>();
 builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<UserService>();
@@ -48,6 +54,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseSession(); 
+app.UseAuthentication(); 
 app.UseAuthorization();
 
 app.MapControllerRoute(

@@ -1,11 +1,5 @@
-﻿using BusPortal.BLL.Services.Interfaces;
-using BusPortal.Common.Models;
-using BusPortal.DAL.Persistence;
-using BusPortal.DAL.Persistence.Entities;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace BusPortal.BLL.Services.Scoped

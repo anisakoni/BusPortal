@@ -1,5 +1,7 @@
 ﻿using AutoMapper; 
 using BusPortal.BLL.Services.Interfaces;
+using BusPortal.BLL.Services.Scoped;
+using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BusPortal.Web.Controllers
@@ -7,25 +9,22 @@ namespace BusPortal.Web.Controllers
     public class ClientsController : Controller
     {
         private readonly IClientService _clientService;
-        private readonly IMapper _mapper;  
+        private readonly IMapper _mapper; 
+        private readonly UserService _userService;
 
-        public ClientsController(IClientService clientService, IMapper mapper)
+
+        public ClientsController(IClientService clientService, IMapper mapper, UserService userService)
         {
             _clientService = clientService ?? throw new ArgumentNullException(nameof(clientService));
             _mapper = mapper;
+            _userService = userService;
         }
 
         
         [HttpGet]
         public IActionResult Register()
         {
-          
-            var registerViewModel = new BusPortal.Common.Models.RegisterViewModel();
-
-           
-            var dtoModel = _mapper.Map<BusPortal.Web.Models.DTO.RegisterViewModel>(registerViewModel);
-
-            return View(dtoModel);  
+            return View();  
         }
 
         
@@ -34,19 +33,12 @@ namespace BusPortal.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-               
-                var commonModel = _mapper.Map<BusPortal.Common.Models.RegisterViewModel>(viewModel);
-
-                var result = await _clientService.RegisterClient(commonModel);
-                if (result)
+                var result = await _userService.RegisterUserAsync(viewModel.Email, viewModel.Password, viewModel.Name);
+                if (result.Succeeded)
                 {
-                    TempData["SuccessMessage"] = "Registration successful!";
-                    return RedirectToAction("Login");
+                    return RedirectToAction("Privacy", "Home");
                 }
-                else
-                {
-                    TempData["ErrorMessage"] = "A client with this email already exists.";
-                }
+                return View(viewModel);
             }
 
             return View(viewModel); 
@@ -59,35 +51,39 @@ namespace BusPortal.Web.Controllers
             return View();
         }
 
-        
+
         [HttpPost]
         public async Task<IActionResult> Login(BusPortal.Web.Models.DTO.LoginViewModel viewModel)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var commonModel = _mapper.Map<BusPortal.Common.Models.LoginViewModel>(viewModel);
-                var isAuthenticated = await _clientService.AuthenticateClient(commonModel);
-                if (isAuthenticated)
-                {
-                    TempData["SuccessMessage"] = "Login successful!";
-                  
-                    return RedirectToAction("Privacy", "Home");
-                }
-                else
-                {
-                    TempData["ErrorMessage"] = "Invalid username or password.";
-                }
+                return View(viewModel);
             }
 
-            return View(viewModel); 
+            var result = await _userService.LoginUserAsync(viewModel.Username, viewModel.Password, viewModel.RememberMe);
+
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Privacy", "Home");
+            }
+
+            if (result.IsLockedOut)
+            {
+                ModelState.AddModelError(string.Empty, "This account has been locked out.");
+            }
+            else
+            {
+                ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            }
+
+            return View(viewModel);
         }
 
-    
+        [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            await _clientService.Logout();
-            TempData["SuccessMessage"] = "You have been logged out.";
-            return RedirectToAction("Login");
+            await _userService.LogoutUserAsync();
+            return RedirectToAction("Index", "Home");
         }
     }
 }

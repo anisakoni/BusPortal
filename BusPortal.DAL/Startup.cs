@@ -18,8 +18,7 @@ public static class Startup
         {
             opt.UseSqlServer(config.GetConnectionString("BusPortal"));
         });
-
-        services.AddIdentity<ApplicationUser, IdentityRole>()
+        services.AddIdentity<IdentityUser, IdentityRole>()
            .AddEntityFrameworkStores<DALDbContext>()
            .AddDefaultTokenProviders();
         //services.AddScoped<ICarBrandsRepository, CarBrandsRepository>();

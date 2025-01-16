@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 namespace BusPortal.DAL.Persistence
 {
-    public class DALDbContext : IdentityDbContext<ApplicationUser>
+    public class DALDbContext : IdentityDbContext<IdentityUser>
     {
         public DALDbContext(DbContextOptions<DALDbContext> options) : base(options)
         {

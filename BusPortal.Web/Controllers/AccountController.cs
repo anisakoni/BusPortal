@@ -19,8 +19,6 @@ namespace BusPortal.Web.Controllers
         [HttpGet]
         public IActionResult Login()
         {
-            // Display the login page
-
             return View();
         }
 
@@ -53,7 +51,6 @@ namespace BusPortal.Web.Controllers
                 }
             }
 
-            // If model validation fails, return the same login view
             return View(model);
         }
 

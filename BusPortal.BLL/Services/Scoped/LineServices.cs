@@ -68,19 +68,56 @@ namespace BusPortal.BLL.Services.Scoped
         }
 
        
-        Task<List<Domain.Models.Line>> ILinesService.GetAllLinesAsync()
+        async Task<List<Domain.Models.Line>> ILinesService.GetAllLinesAsync()
         {
-            throw new NotImplementedException();
+            var lines = await _lineRepository.GetAllAsync();
+            var domainLines = new List<Domain.Models.Line>();
+
+            foreach (var line in lines)
+            {
+                domainLines.Add(new Domain.Models.Line
+                {
+                    Id = line.Id,
+                    StartCity = line.StartCity,
+                    DestinationCity = line.DestinationCity,
+                    DepartureTimes = line.DepartureTimes
+                });
+            }
+
+            return domainLines;
         }
 
-        Task<Domain.Models.Line> ILinesService.GetLineByIdAsync(Guid id)
+        async Task<Domain.Models.Line> ILinesService.GetLineByIdAsync(Guid id)
         {
-            throw new NotImplementedException();
+            var line = await _lineRepository.GetByIdAsync(id);
+
+            if (line == null)
+            {
+                return null;
+            }
+
+            return new Domain.Models.Line
+            {
+                Id = line.Id,
+                StartCity = line.StartCity,
+                DestinationCity = line.DestinationCity,
+                DepartureTimes = line.DepartureTimes
+            };
         }
 
-        public Task UpdateLineAsync(Domain.Models.Line viewModel)
+        public async Task UpdateLineAsync(Domain.Models.Line viewModel)
         {
-            throw new NotImplementedException();
+            var line = await _lineRepository.GetByIdAsync(viewModel.Id);
+
+            if (line != null)
+            {
+                line.StartCity = viewModel.StartCity;
+                line.DestinationCity = viewModel.DestinationCity;
+                line.DepartureTimes = viewModel.DepartureTimes;
+
+                _lineRepository.Update(line);
+                await _lineRepository.SaveChangesAsync();
+            }
         }
     }
 }

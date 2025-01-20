@@ -1,5 +1,5 @@
-﻿using BusPortal.DAL.Persistence.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using BusPortal.DAL.Persistence.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +16,9 @@ namespace BusPortal.DAL.Persistence.Repositories
         void Remove(Line line);
         Task SaveChangesAsync(); 
         void Update(Line entity);
+        Task<IEnumerable<string>> GetAllStartCitiesAsync();
+        Task<IEnumerable<string>> GetDestinationCitiesForStartCityAsync(string startCity);
+        Task<Line> GetLineByRouteAsync(string startCity, string destinationCity);
     }
 
     internal class LineRepository : _BaseRepository<Line, Guid>, ILineRepository
@@ -59,6 +62,32 @@ namespace BusPortal.DAL.Persistence.Repositories
         public void Update(Line entity)
         {
             _dbContext.Update(entity);
+        }
+
+        public async Task<IEnumerable<string>> GetAllStartCitiesAsync()
+        {
+            return await _dbContext.Lines
+                .Select(l => l.StartCity)
+                .Distinct()
+                .OrderBy(c => c)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<string>> GetDestinationCitiesForStartCityAsync(string startCity)
+        {
+            return await _dbContext.Lines
+                .Where(l => l.StartCity == startCity)
+                .Select(l => l.DestinationCity)
+                .Distinct()
+                .OrderBy(c => c)
+                .ToListAsync();
+        }
+
+        public async Task<Line> GetLineByRouteAsync(string startCity, string destinationCity)
+        {
+            return await _dbContext.Lines
+                .FirstOrDefaultAsync(l => l.StartCity == startCity && 
+                                        l.DestinationCity == destinationCity);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using BusPortal.DAL.Persistence;
+﻿using Azure.Core.GeoJson;
+using BusPortal.DAL.Persistence;
 using BusPortal.DAL.Persistence.Entities;
 using BusPortal.DAL.Persistence.Repositories;
 using Microsoft.AspNetCore.Identity;
@@ -20,5 +21,8 @@ public static class Startup
            .AddEntityFrameworkStores<DALDbContext>()
            .AddDefaultTokenProviders();
         //services.AddScoped<ICarBrandsRepository, CarBrandsRepository>();
+        services.AddScoped<ILineRepository, LineRepository>();
+        services.AddScoped<IBookingRepository, BookingRepository>();
+        services.AddScoped<IClientRepository, ClientRepository>();
     }
 }

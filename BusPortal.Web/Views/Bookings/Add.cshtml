@@ -10,32 +10,66 @@
     ViewData["Title"] = "Create Booking";
 }
 
-<h2>Create New Booking</h2>
+<div class="container mt-5">
+    <h2>Create New Booking</h2>
+    <form asp-action="Add" method="post">
+        <div class="form-group mb-3">
+            <label asp-for="StartCity">Start City</label>
+            <select asp-for="StartCity" 
+                    class="form-control" 
+                    asp-items="ViewBag.StartCities"
+                    id="startCitySelect">
+                <option value="">Select Start City</option>
+            </select>
+            <span asp-validation-for="StartCity" class="text-danger"></span>
+        </div>
 
-<form asp-action="Add" method="post">
-    <div class="form-group">
-        <label for="StartCity">Start City</label>
-        <input type="text" class="form-control" id="StartCity" name="StartCity" required />
-    </div>
-    <div class="form-group">
-        <label for="DestinationCity">Destination City</label>
-        <input type="text" class="form-control" id="DestinationCity" name="DestinationCity" required />
-    </div>
-    <div class="form-group">
-        <label for="Date">Date</label>
-        <input type="date" class="form-control" id="Date" name="Date" required />
-    </div>
-    <div class="form-group">
-        <label for="Time">Time</label>
-        <input type="time" class="form-control" id="Time" name="Time" required />
-    </div>
-    <div class="form-group">
-        <label for="Seat">Seat</label>
-        <input type="text" class="form-control" id="Seat" name="Seat" required />
-    </div>
+        <div class="form-group mb-3">
+            <label asp-for="DestinationCity">Destination City</label>
+            <select asp-for="DestinationCity" 
+                    class="form-control" 
+                    id="destinationCitySelect" 
+                    disabled>
+                <option value="">Select Destination City</option>
+            </select>
+            <span asp-validation-for="DestinationCity" class="text-danger"></span>
+        </div>
 
-    <button type="submit" class="btn btn-primary">Create Booking</button>
-</form>
+        <div class="form-group mb-3">
+            <label asp-for="Seat">Seat Number</label>
+            <input asp-for="Seat" class="form-control" />
+            <span asp-validation-for="Seat" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create Booking</button>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+            $('#startCitySelect').change(function () {
+                var startCity = $(this).val();
+                var destinationSelect = $('#destinationCitySelect');
+                
+                destinationSelect.empty();
+                destinationSelect.append($('<option></option>').val('').text('Select Destination City'));
+                
+                if (startCity) {
+                    $.getJSON('/Bookings/GetDestinationCities', { startCity: startCity }, function (cities) {
+                        $.each(cities, function (i, city) {
+                            destinationSelect.append($('<option></option>').val(city).text(city));
+                        });
+                        destinationSelect.prop('disabled', false);
+                    });
+                } else {
+                    destinationSelect.prop('disabled', true);
+                }
+            });
+        });
+    </script>
+}
 
 @if (TempData["SuccessMessage"] != null)
 {

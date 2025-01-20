@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BusPortal.BLL\BusPortal.BLL.csproj" />
-    <ProjectReference Include="..\BusPortal.DAL\BusPortal.DAL.csproj" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties wwwroot_4lib_4bootstrap_4dist_4css_4bootstrap-reboot_1min_1css_1map__JsonSchema="" /></VisualStudio></ProjectExtensions>

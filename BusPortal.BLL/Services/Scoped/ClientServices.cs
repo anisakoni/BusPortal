@@ -16,11 +16,13 @@ namespace BusPortal.BLL.Services
         private readonly IMapper _mapper;
         private readonly IPasswordHasher<Client> _passwordHasher;
 
-        public ClientService(IClientRepository clientRepository, IMapper mapper, IPasswordHasher<Client> passwordHasher)
+        public ClientService(IClientRepository clientRepository, IMapper mapper
+            //, IPasswordHasher<Client> passwordHasher
+            )
         {
             _clientRepository = clientRepository ?? throw new ArgumentNullException(nameof(clientRepository));
             _mapper = mapper;
-            _passwordHasher = passwordHasher ?? throw new ArgumentNullException(nameof(passwordHasher));
+            //_passwordHasher = passwordHasher ?? throw new ArgumentNullException(nameof(passwordHasher));
         }
 
         public async Task<bool> RegisterClient(RegisterViewModel model)

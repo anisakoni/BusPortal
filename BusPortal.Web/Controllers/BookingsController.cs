@@ -1,61 +1,65 @@
 ﻿using BusPortal.BLL.Services.Scoped;
 using Microsoft.AspNetCore.Mvc;
 using BusPortal.BLL.Services.Interfaces;
+using BusPortal.Common.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using BusPortal.DAL.Persistence.Repositories;
 
 namespace BusPortal.Web.Controllers
 {
+    [Authorize]
     public class BookingsController : Controller
     {
         private readonly IBookingServices _bookingServices;
+        private readonly ILineRepository _lineRepository;
 
-        public BookingsController(IBookingServices bookingServices)
+        public BookingsController(IBookingServices bookingServices, ILineRepository lineRepository)
         {
             _bookingServices = bookingServices;
+            _lineRepository = lineRepository;
         }
 
-        [HttpGet]
-        public IActionResult Add()
+        public async Task<IActionResult> Add()
         {
+            var startCities = await _lineRepository.GetAllStartCitiesAsync();
+            ViewBag.StartCities = new SelectList(startCities);
             return View();
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Add(BusPortal.Web.Models.DTO.AddBookingViewModel viewModel)
+        [HttpGet]
+        public async Task<IActionResult> GetDestinationCities(string startCity)
+        {
+            var destinationCities = await _lineRepository.GetDestinationCitiesForStartCityAsync(startCity);
+            return Json(destinationCities);
+        }
 
+        [HttpPost]
+        public async Task<IActionResult> Add(AddBookingViewModel model)
         {
             if (ModelState.IsValid)
             {
-                var userName = User.Identity.Name;
-
-                if (userName == null)
+                var line = await _lineRepository.GetLineByRouteAsync(model.StartCity, model.DestinationCity);
+                if (line == null)
                 {
-                    TempData["ErrorMessage"] = "User identity not found.";
-                    return View(viewModel);
+                    ModelState.AddModelError("", "Selected route is not available");
+                    return View(model);
                 }
 
-                var commonViewModel = new BusPortal.Common.Models.AddBookingViewModel
-                {
-                    StartCity = viewModel.StartCity,
-                    DestinationCity = viewModel.DestinationCity,
-                    Date = viewModel.Date,
-                    Time = viewModel.Time,
-                    Seat = viewModel.Seat
-                };
-
-                var result = _bookingServices.AddBooking(commonViewModel, userName);
-
-                if (!result.Success)
-                {
-                    TempData["ErrorMessage"] = result.ErrorMessage;
-                    return View(viewModel);
-                }
-
-                TempData["SuccessMessage"] = "Booking created successfully!";
-                return RedirectToAction("Add");
+                //model.LineId = line.Id;
+                //var result = await _bookingServices.CreateBookingAsync(model);
+                //if (result.Success)
+                //{
+                    //return RedirectToAction("Index", "Home");
+                //}
+                //ModelState.AddModelError("", result.ErrorMessage);
             }
-
-            return View(viewModel);
+            
+            var startCities = await _lineRepository.GetAllStartCitiesAsync();
+            ViewBag.StartCities = new SelectList(startCities);
+            return View(model);
         }
     }
 }
+
+

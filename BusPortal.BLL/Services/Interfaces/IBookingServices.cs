@@ -10,5 +10,6 @@ namespace BusPortal.BLL.Services.Interfaces
     public interface IBookingServices
     {
         (bool Success, string? ErrorMessage) AddBooking(AddBookingViewModel viewModel, string userName);
+       
     }
 }

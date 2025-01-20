@@ -9,19 +9,21 @@ namespace BusPortal.BLL.Services.Scoped
     public class BookingServices : IBookingServices
     {
         private readonly IBookingRepository _bookingRepository;
-        private readonly IClientRepository _clientRepository;
-        private readonly ILineRepository _lineRepository;
+         private readonly IClientRepository _clientRepository;
+         private readonly ILineRepository _lineRepository;
 
+        
         public BookingServices(
-            IBookingRepository bookingRepository,
-            IClientRepository clientRepository,
-            ILineRepository lineRepository)
+        
+          IBookingRepository bookingRepository,
+           IClientRepository clientRepository,
+           ILineRepository lineRepository)
         {
-            _bookingRepository = bookingRepository;
-            _clientRepository = clientRepository;
+           _bookingRepository = bookingRepository;
+           _clientRepository = clientRepository;
             _lineRepository = lineRepository;
-        }
-
+           }
+        
         public (bool Success, string? ErrorMessage) AddBooking(AddBookingViewModel viewModel, string userName)
         {
             try
@@ -32,7 +34,7 @@ namespace BusPortal.BLL.Services.Scoped
                     return (false, "Client not found for the logged-in user.");
                 }
 
-                var line = _lineRepository.GetAll().FirstOrDefault(l => l.StartCity == viewModel.StartCity && l.DestinationCity == viewModel.DestinationCity);
+                var line = _lineRepository.GetAll().FirstOrDefault();
                 if (line == null)
                 {
                     return (false, "The specified route does not exist.");
@@ -43,8 +45,10 @@ namespace BusPortal.BLL.Services.Scoped
                     Id = Guid.NewGuid(),
                     Client = client,
                     Line = line,
-                    DateTime = viewModel.Date.Add(viewModel.Time),
-                    Seat = viewModel.Seat
+                    DateTime = viewModel.DateTime,
+                    Seat = viewModel.Seat,
+                    Price = viewModel.Price,
+
                 };
 
                 _bookingRepository.Add(booking);

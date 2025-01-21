@@ -14,12 +14,11 @@ namespace BusPortal.BLL.Services
             services.RegisterDALServices(config);
 
 
-
             services.AddScoped<ILinesService, LinesService>();
             services.AddScoped<IBookingServices, BookingServices>();
             services.AddScoped<IClientService, ClientService>();
-
-            
+            services.AddSingleton<EmailService>();
+            services.AddScoped<UserService>();
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         }
     }

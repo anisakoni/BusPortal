@@ -1,11 +1,4 @@
 ﻿using BusPortal.Common.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BusPortal.Common.Models;
-using System.Threading.Tasks;
 
 namespace BusPortal.BLL.Services.Interfaces
 {

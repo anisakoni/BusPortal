@@ -12,7 +12,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.RegisterBLLServices(builder.Configuration);
-builder.Services.RegisterDALServices(builder.Configuration);
 
 
 builder.Services.AddAuthentication()
@@ -33,9 +32,7 @@ builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<EmailService>();
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-    .AddEntityFrameworkStores<DALDbContext>()
-    .AddDefaultTokenProviders();
+
 
 
 

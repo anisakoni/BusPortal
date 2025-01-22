@@ -64,7 +64,7 @@ namespace BusPortal.BLL.Services.Scoped
             if (user != null)
             {
                 var token = await _userRepository.GeneratePasswordResetTokenAsync(user);
-                var resetLink = $"https://yourwebsite.com/User/ResetPassword?token={token}&email={email}";
+                var resetLink = $"http://localhost:5078/Clients/ResetPassword?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(email)}";
 
                 await _emailService.SendEmailAsync(
                     email,
@@ -72,6 +72,10 @@ namespace BusPortal.BLL.Services.Scoped
                     $"<p>Click <a href='{resetLink}'>here</a> to reset your password.</p>"
                 );
             }
+        }
+        public async Task<bool> VerifyPasswordResetTokenAsync(IdentityUser user, string token)
+        {
+            return await _userRepository.VerifyPasswordResetTokenAsync(user, token);
         }
     }
 }

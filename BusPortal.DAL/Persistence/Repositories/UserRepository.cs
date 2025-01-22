@@ -45,5 +45,16 @@ namespace BusPortal.DAL.Persistence.Repositories
         {
             return await _userManager.ResetPasswordAsync(user, token, newPassword);
         }
+
+        public async Task<bool> VerifyPasswordResetTokenAsync(IdentityUser user, string token)
+        {
+            return await _userManager.VerifyUserTokenAsync(
+                user,
+                _userManager.Options.Tokens.PasswordResetTokenProvider,
+                "ResetPassword",
+                token);
+        }
+
+
     }
 }

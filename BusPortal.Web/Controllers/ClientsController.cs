@@ -54,7 +54,7 @@ namespace BusPortal.Web.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel viewModel)
+        public async Task<IActionResult> Login(BusPortal.Web.Models.DTO.LoginViewModel viewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -118,8 +118,9 @@ namespace BusPortal.Web.Controllers
             {
                 return BadRequest("Invalid password reset token.");
             }
+            string decodedToken = Uri.UnescapeDataString(token);
 
-            var model = new ResetPasswordViewModel { Token = token, Email = email };
+            var model = new ResetPasswordViewModel { Token = decodedToken, Email = email };
             return View(model);
         }
 
@@ -135,6 +136,14 @@ namespace BusPortal.Web.Controllers
 
             if (user != null)
             {
+
+                var isTokenValid = await _userService.VerifyPasswordResetTokenAsync(user, viewModel.Token);
+
+                if (!isTokenValid)
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid or expired token.");
+                    return View(viewModel);
+                }
                 var result = await _userService.ResetUserPasswordAsync(user, viewModel.Token, viewModel.Password);
 
                 if (result.Succeeded)
@@ -148,7 +157,7 @@ namespace BusPortal.Web.Controllers
                 }
             }
 
-            return View(viewModel);
+            return View("ResetPasswordConfirmation");
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using AutoMapper; 
 using BusPortal.BLL.Services.Interfaces;
 using BusPortal.BLL.Services.Scoped;
-using BusPortal.Web.Models.DTO;
+using BusPortal.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BusPortal.Web.Controllers
@@ -36,6 +36,7 @@ namespace BusPortal.Web.Controllers
                 var result = await _userService.RegisterUserAsync(viewModel.Email, viewModel.Password, viewModel.Name);
                 if (result.Succeeded)
                 {
+                    _clientService.RegisterClient(viewModel);
                     return RedirectToAction("Privacy", "Home");
                 }
                 return View(viewModel);

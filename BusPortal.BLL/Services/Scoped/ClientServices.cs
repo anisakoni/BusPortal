@@ -36,8 +36,6 @@ namespace BusPortal.BLL.Services
                 return false; 
             }
 
-            clientEntity.Password = _passwordHasher.HashPassword(clientEntity, model.Password);
-
             
             _clientRepository.Add(clientEntity);
             _clientRepository.SaveChanges();

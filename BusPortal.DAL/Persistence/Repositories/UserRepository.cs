@@ -25,6 +25,7 @@ namespace BusPortal.DAL.Persistence.Repositories
         {
             return await _userManager.FindByEmailAsync(email);
         }
+       
 
         public async Task<SignInResult> LoginAsync(string email, string password, bool rememberMe)
         {

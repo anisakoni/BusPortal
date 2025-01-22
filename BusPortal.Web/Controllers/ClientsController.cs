@@ -9,15 +9,13 @@ namespace BusPortal.Web.Controllers
     public class ClientsController : Controller
     {
         private readonly IClientService _clientService;
-        private readonly IMapper _mapper; 
         private readonly UserService _userService;
 
 
         public ClientsController(IClientService clientService, IMapper mapper, UserService userService)
         {
             _clientService = clientService ?? throw new ArgumentNullException(nameof(clientService));
-            _mapper = mapper;
-            _userService = userService;
+             _userService = userService;
         }
 
         
@@ -36,7 +34,7 @@ namespace BusPortal.Web.Controllers
                 var result = await _userService.RegisterUserAsync(viewModel.Email, viewModel.Password, viewModel.Name);
                 if (result.Succeeded)
                 {
-                    _clientService.RegisterClient(viewModel);
+                    await _clientService.RegisterClient(viewModel);
                     return RedirectToAction("Privacy", "Home");
                 }
                 return View(viewModel);
@@ -54,7 +52,7 @@ namespace BusPortal.Web.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Login(BusPortal.Web.Models.DTO.LoginViewModel viewModel)
+        public async Task<IActionResult> Login(LoginViewModel viewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -119,7 +117,6 @@ namespace BusPortal.Web.Controllers
                 return BadRequest("Invalid password reset token.");
             }
             string decodedToken = Uri.UnescapeDataString(token);
-
             var model = new ResetPasswordViewModel { Token = decodedToken, Email = email };
             return View(model);
         }

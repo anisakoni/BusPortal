@@ -45,7 +45,7 @@ namespace BusPortal.BLL.Services
         public async Task<bool> AuthenticateClient(LoginViewModel model)
         {
 
-            var clientEntity = _clientRepository.GetAll().FirstOrDefault(c => c.Email == model.Email);
+            var clientEntity = _clientRepository.GetAll().FirstOrDefault(c => c.Name == model.Username);
             if (clientEntity == null)
             {
                 return false; 

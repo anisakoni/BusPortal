@@ -34,9 +34,19 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<EmailService>();
 
 
-
-
 builder.Services.AddHttpContextAccessor();
+
+//Add authentication configuration
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Clients/Login";
+    options.LogoutPath = "/Clients/Logout";
+    options.AccessDeniedPath = "/Clients/AccessDenied";
+    options.Cookie.Name = "BusPortalAuth";
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromHours(24);
+    options.SlidingExpiration = true;
+});
 
 var app = builder.Build();
 

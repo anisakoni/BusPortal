@@ -28,9 +28,41 @@ namespace BusPortal.Web.Controllers
         //     return View();
         //  }
 
-        [HttpGet]
-        public IActionResult Add()
+
+
+        //method to fetch available seats for a specific route or booking
+    public async Task<IActionResult> ViewAvailableSeats(string startCity, string destinationCity, DateTime dateTime, string seat)
         {
+            var line = await _lineRepository.GetLineByRouteAsync(startCity, destinationCity);
+            if(line == null)
+            {
+                ModelState.AddModelError("", "Selected route is not available");
+                return View();
+            }
+            var availableSeats = await _bookingServices.GetAvailableSeatAsync(line.Id, dateTime);
+            return View(availableSeats);
+            
+        }
+
+        //populating `ViewBag.OccupiedSeats` with the correct data
+     public async Task<IActionResult> Add()
+        {
+            
+
+          var occupiedSeats = await _bookingServices.GetOccupiedSeatsAsync();
+          ViewBag.OccupiedSeats = occupiedSeats;
+           return View();
+        }
+
+        
+
+
+
+
+
+  //      [HttpGet]
+   //     public IActionResult Add()
+       // {
             // Check if user is authenticated
             //    if (!User.Identity.IsAuthenticated)
             //    {
@@ -39,8 +71,8 @@ namespace BusPortal.Web.Controllers
             //    }
 
             // User is authenticated, show the booking form
-            return View();
-        }
+        //    return View();
+      //  }
 
         [HttpGet]
         public async Task<IActionResult> GetDestinationCities(string startCity)
@@ -54,27 +86,21 @@ namespace BusPortal.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var line = await _lineRepository.GetLineByRouteAsync(model.StartCity, model.DestinationCity);
-                if (line == null)
+
+var line = await _lineRepository.GetLineByRouteAsync(model.StartCity, model.DestinationCity);
+              if (line == null)
                 {
                     ModelState.AddModelError("", "Selected route is not available");
                     return View(model);
-                }
+               }
 
-                //model.LineId = line.Id;
-                //var result = await _bookingServices.CreateBookingAsync(model);
-                //if (result.Success)
-                //{
-                //return RedirectToAction("Index", "Home");
-                //}
-                //ModelState.AddModelError("", result.ErrorMessage);
             }
 
             var startCities = await _lineRepository.GetAllStartCitiesAsync();
             ViewBag.StartCities = new SelectList(startCities);
             return View(model);
         }
-    }
+   }
 }
 
 

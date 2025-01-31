@@ -16,9 +16,9 @@
         <div class="form-group mb-3">
             <label asp-for="StartCity">Start City</label>
             <select asp-for="StartCity" 
-                    class="form-control" 
-                    asp-items="ViewBag.StartCities"
-                    id="startCitySelect">
+            class="form-control" 
+            asp-items="ViewBag.StartCities"
+            id="startCitySelect">
                 <option value="">Select Start City</option>
             </select>
             <span asp-validation-for="StartCity" class="text-danger"></span>
@@ -27,19 +27,58 @@
         <div class="form-group mb-3">
             <label asp-for="DestinationCity">Destination City</label>
             <select asp-for="DestinationCity" 
-                    class="form-control" 
-                    id="destinationCitySelect" 
-                    >
+            class="form-control" 
+            id="destinationCitySelect" 
+            >
                 <option value="">Select Destination City</option>
             </select>
             <span asp-validation-for="DestinationCity" class="text-danger"></span>
         </div>
 
-        <div class="form-group mb-3">
-            <label asp-for="Seat">Seat Number</label>
-            <input asp-for="Seat" class="form-control" />
-            <span asp-validation-for="Seat" class="text-danger"></span>
+        <div class="form-group mt-3">
+            <label>Select Your Seat</label>
+            @using System.Linq
+
+            @{
+                bool IsOccupied(string seat){
+					var occupiedSeatsList = ViewBag.OccupiedSeats as List<string>;
+					if (occupiedSeatsList != null)
+					{
+						return occupiedSeatsList.Any(occupiedSeat => occupiedSeat.Trim() == seat);
+					}
+					return false;
+                
+                }
+            }
+            <div class="bus-layout">
+                <div class="seats-container">
+                    @for (int row = 1; row <= 10; row++)
+                    {
+                        <div class="seat-row">
+                            <div class="seat @(IsOccupied($" {row}A") ? "occupied" : "available")" data-seat="@(row)A">
+                                <input type="checkbox" name="selectedSeats" value="@($" {row}A")" @(IsOccupied($"{row}A") ? "disabled" : "") />
+                                @($"{row}A")
+                            </div>
+                            <div class="seat @(IsOccupied($" {row}B") ? "occupied" : "available")" data-seat="@(row)B">
+                                <input type="checkbox" name="selectedSeats" value="@($" {row}B")" @(IsOccupied($"{row}B") ? "disabled" : "") />
+                                @($"{row}B")
+                            </div>
+                            <div class="seat @(IsOccupied($" {row}C") ? "occupied" : "available")" data-seat="@(row)C">
+                                <input type="checkbox" name="selectedSeats" value="@($" {row}C")" @(IsOccupied($"{row}C") ? "disabled" : "") />
+                                @($"{row}C")
+                            </div>
+                            <div class="seat @(IsOccupied($" {row}D") ? "occupied" : "available")" data-seat="@(row)D">
+                                <input type="checkbox" name="selectedSeats" value="@($" {row}D")" @(IsOccupied($"{row}D") ? "disabled" : "") />
+                                @($"{row}D")
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+                    
+            <input type="hidden" id="selectedSeat" name="Seat" required />
         </div>
+
         <div class="form-group mb-3">
             <label asp-for="Price">Price</label>
             <input asp-for="Price" class="form-control" />
@@ -54,35 +93,111 @@
     </form>
 </div>
 
+<style>
+    .bus-layout {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+    }
+
+    .seats-container {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .seat-row {
+        display: flex;
+        justify-content: center;
+        margin: 5px 0;
+    }
+
+    .seat {
+        width: 40px;
+        height: 40px;
+        margin: 3px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .seat:hover {
+        background: #e9ecef;
+    }
+
+    .seat.selected {
+        background: #0d6efd;
+        color: white;
+    }
+
+    .seat.occupied {
+        background: #dc3545;
+        color: white;
+        cursor: not-allowed;
+    }
+
+    .aisle {
+        width: 20px;
+    }
+</style>
+
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script>
-        $(document).ready(function () {
-            $('#startCitySelect').change(function () {
-                var startCity = $(this).val();
-                var destinationSelect = $('#destinationCitySelect');
-                
-                destinationSelect.empty();
-                destinationSelect.append($('<option></option>').val('').text('Select Destination City'));
-                
-                if (startCity) {
-                    $.getJSON('/Bookings/GetDestinationCities', { startCity: startCity }, function (cities) {
-                        $.each(cities, function (i, city) {
-                            destinationSelect.append($('<option></option>').val(city).text(city));
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+        <script>
+            $(document).ready(function () {
+                $('#startCitySelect').change(function () {
+                    var startCity = $(this).val();
+                    var destinationSelect = $('#destinationCitySelect');
+
+                    destinationSelect.empty();
+                    destinationSelect.append($('<option></option>').val('').text('Select Destination City'));
+
+                    if (startCity) {
+                        $.getJSON('/Bookings/GetDestinationCities', { startCity: startCity }, function (cities) {
+                            $.each(cities, function (i, city) {
+                                destinationSelect.append($('<option></option>').val(city).text(city));
+                            });
+                            destinationSelect.prop('disabled', false);
                         });
-                        destinationSelect.prop('disabled', false);
-                    });
-                } else {
-                    destinationSelect.prop('disabled', true);
-                }
+                    } else {
+                        destinationSelect.prop('disabled', true);
+                    }
+                });
+
+                $('.seat').click(function() {
+                    if ($(this).hasClass('occupied')) {
+                        return;
+                    }
+
+                    $('.seat').removeClass('selected');
+                    $(this).addClass('selected');
+                    $('#selectedSeat').val($(this).data('seat'));
+                });
+
+                $('form').submit(function(e) {
+                    if (!$('#selectedSeat').val()) {
+                        e.preventDefault();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: 'Please select a seat!'
+                        });
+                    }
+                });
             });
-        });
-    </script>
+        </script>
 }
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success mt-3">
+        <div class="alert alert-success mt-3">
         @TempData["SuccessMessage"]
-    </div>
+        </div>
 }

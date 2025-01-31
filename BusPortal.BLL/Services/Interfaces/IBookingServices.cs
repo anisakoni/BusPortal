@@ -9,7 +9,17 @@ namespace BusPortal.BLL.Services.Interfaces
 {
     public interface IBookingServices
     {
-        (bool Success, string? ErrorMessage) AddBooking(AddBookingViewModel viewModel, string userName);
-       
+        //  (bool Success, string? ErrorMessage) AddBooking(AddBookingViewModel viewModel, string userName);
+
+        //add  seat selection system
+        (bool Success, string? ErrorMessage) AddBooking(AddBookingViewModel viewModel, string userName, string seat);
+
+        Task<IEnumerable<int>> GetAvailableSeatAsync(Guid Id, DateTime dateTime);
+        Task<IEnumerable<int>> GetOccupiedSeatsAsync();
+        
+
+
+
+
     }
 }

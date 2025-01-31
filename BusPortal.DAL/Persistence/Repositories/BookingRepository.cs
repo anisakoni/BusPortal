@@ -14,6 +14,9 @@ namespace BusPortal.DAL.Persistence.Repositories
         Task<bool> IsSeatAvailableAsync(string startCity, string destinationCity,
             TimeSpan departureTime, string seat);
         Task<bool> AddAsync(Booking booking);
+        Task<IEnumerable<Booking>> GetBookingsByLineAsync(Guid Id, DateTime dateTime);
+        Task<IEnumerable<Booking>> GetAsync();
+        Task<IEnumerable<int>> GetOccupiedSeatsAsync(string seat);
     }
     internal class BookingRepository : _BaseRepository<Booking, Guid>, IBookingRepository
     {
@@ -32,6 +35,23 @@ namespace BusPortal.DAL.Persistence.Repositories
         //        .ToListAsync();
         //}
 
+
+     
+        public async Task<IEnumerable<Booking>> GetBookingsByLineAsync(Guid Id, DateTime dateTime)
+       {
+            return await _context.Bookings
+               .Where(b => b.Line.Id == Id && b.DateTime == dateTime)
+               .ToListAsync();
+        }
+
+        
+        public async Task<IEnumerable<Booking>> GetAsync()
+        {
+            return await _context.Bookings.ToListAsync();
+        }
+
+
+
         public async Task<bool> IsSeatAvailableAsync(decimal price, string seat)
         {
             return !await _context.Bookings
@@ -39,6 +59,15 @@ namespace BusPortal.DAL.Persistence.Repositories
                     b.Price == price
                     && b.Seat == seat);
         }
+
+      
+        public async Task<IEnumerable<int>> GetOccupiedSeatsAsync(string seat)
+        {
+            var bookings = await _context.Bookings.ToListAsync();
+            var occupiedSeats = bookings.Select(b => int.Parse(b.Seat));
+            return occupiedSeats;
+        }
+
 
         public async Task<bool> AddAsync(Booking booking)
         {

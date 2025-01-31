@@ -1,8 +1,10 @@
+using BusPortal.BLL.Domain.Models;
 using BusPortal.BLL.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.RegisterBLLServices(builder.Configuration);
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("StripeSettings"));
 
 builder.Services.AddAuthentication()
     .AddCookie(options =>

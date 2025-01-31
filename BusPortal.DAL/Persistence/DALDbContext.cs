@@ -37,7 +37,7 @@ namespace BusPortal.DAL.Persistence
 
                 entity.HasKey(e => e.Id);
 
-                entity.HasOne(e => e.Line)
+             entity.HasOne(e => e.Line)
              .WithMany()
              .HasForeignKey(e => e.Line)
              .OnDelete(DeleteBehavior.Restrict);

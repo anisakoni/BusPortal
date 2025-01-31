@@ -7,14 +7,13 @@ using System.Threading.Tasks;
 
 namespace BusPortal.DAL.Persistence.Repositories
 {
-    
     public interface ILineRepository : _IBaseRepository<Line, Guid>
     {
-        Task AddAsync(Line entity); 
-        Task<List<Line>> GetAllAsync(); 
-        Task<Line> GetByIdAsync(Guid id); 
+        Task AddAsync(Line entity);
+        Task<List<Line>> GetAllAsync();
+        Task<Line> GetByIdAsync(Guid id);
         void Remove(Line line);
-        Task SaveChangesAsync(); 
+        Task SaveChangesAsync();
         void Update(Line entity);
         Task<IEnumerable<string>> GetAllStartCitiesAsync();
         Task<IEnumerable<string>> GetDestinationCitiesForStartCityAsync(string startCity);
@@ -30,30 +29,31 @@ namespace BusPortal.DAL.Persistence.Repositories
             _dbContext = dbContext;
         }
 
-        
         public async Task AddAsync(Line entity)
         {
             await _dbContext.Set<Line>().AddAsync(entity);
         }
 
-        
         public async Task<List<Line>> GetAllAsync()
         {
             return await _dbContext.Set<Line>().AsNoTracking().ToListAsync();
         }
 
-        
-        public async Task<Line> GetByIdAsync(Guid id)
+        public async Task<Line?> GetByIdAsync(Guid id)
         {
-            return await _dbContext.Set<Line>().FindAsync(id) ?? throw new InvalidOperationException("Entity not found");
+            return await _dbContext.Set<Line>().FindAsync(id);
         }
 
         public void Remove(Line line)
         {
-            throw new NotImplementedException();
+            if (line == null)
+            {
+                throw new ArgumentNullException(nameof(line), "Line cannot be null.");
+            }
+
+            _dbContext.Set<Line>().Remove(line);
         }
 
-        
         public async Task SaveChangesAsync()
         {
             await _dbContext.SaveChangesAsync();
@@ -86,8 +86,8 @@ namespace BusPortal.DAL.Persistence.Repositories
         public async Task<Line> GetLineByRouteAsync(string startCity, string destinationCity)
         {
             return await _dbContext.Lines
-                .FirstOrDefaultAsync(l => l.StartCity == startCity && 
-                                        l.DestinationCity == destinationCity);
+                .FirstOrDefaultAsync(l => l.StartCity == startCity &&
+                                          l.DestinationCity == destinationCity);
         }
     }
 }

@@ -36,9 +36,14 @@ namespace BusPortal.BLL.Services.Scoped
             return await _lineRepository.GetAllAsync(); 
         }
 
-        public async Task<Line> GetLineByIdAsync(Guid id)
+        //public async Task<Line> GetLineByIdAsync(Guid id)
+        //{
+        //    return await _lineRepository.GetByIdAsync(id); 
+        //}
+        public async Task<Line?> GetLineByIdAsync(Guid id)
         {
-            return await _lineRepository.GetByIdAsync(id); 
+            var line = await _lineRepository.GetByIdAsync(id);
+            return line; // Just return null if not found, don’t throw an exception
         }
 
         public async Task UpdateLineAsync(Line viewModel)
@@ -58,16 +63,20 @@ namespace BusPortal.BLL.Services.Scoped
 
         public async Task DeleteLineAsync(Guid id)
         {
-            var line = await _lineRepository.GetByIdAsync(id);
+            
+                var line = await _lineRepository.GetByIdAsync(id);
+                if (line == null)
+                {
+                    throw new InvalidOperationException("Line not found.");
+                }
 
-            if (line != null)
-            {
-                _lineRepository.Remove(line); 
+                _lineRepository.Remove(line);
                 await _lineRepository.SaveChangesAsync();
-            }
+           
+
         }
 
-       
+
         async Task<List<Domain.Models.Line>> ILinesService.GetAllLinesAsync()
         {
             var lines = await _lineRepository.GetAllAsync();

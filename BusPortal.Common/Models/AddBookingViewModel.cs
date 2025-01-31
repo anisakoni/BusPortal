@@ -9,15 +9,6 @@ namespace BusPortal.Common.Models
 {
     public class AddBookingViewModel
     {
-
-        [Required(ErrorMessage = "Date is required")]
-        public DateTime DateTime { get; set; }
-
-        [Required(ErrorMessage = "Price is required")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
-        public decimal Price { get; set; }
-
-
         [Required(ErrorMessage = "Start city is required")]
         public string StartCity { get; set; }
 
@@ -26,6 +17,16 @@ namespace BusPortal.Common.Models
 
         [Required(ErrorMessage = "Seat number is required")]
         public string Seat { get; set; }
-       
+
+
+
+        [Required(ErrorMessage = "Price is required")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
+        public decimal Price { get; set; }
+
+        [Required(ErrorMessage = "Date is required")]
+        public DateTime DateTime { get; set; }
+
+
     }
 }

@@ -20,9 +20,11 @@ public static class Startup
         services.AddIdentity<IdentityUser, IdentityRole>()
            .AddEntityFrameworkStores<DALDbContext>()
            .AddDefaultTokenProviders();
-        //services.AddScoped<ICarBrandsRepository, CarBrandsRepository>();
         services.AddScoped<ILineRepository, LineRepository>();
         services.AddScoped<IBookingRepository, BookingRepository>();
         services.AddScoped<IClientRepository, ClientRepository>();
+        services.AddScoped<UserRepository>();
+
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     }
 }

@@ -1,4 +1,4 @@
-﻿using BusPortal.BLL.Services.Scoped;
+using BusPortal.BLL.Services.Scoped;
 using Microsoft.AspNetCore.Mvc;
 using BusPortal.BLL.Services.Interfaces;
 using BusPortal.Common.Models;
@@ -8,22 +8,37 @@ using BusPortal.DAL.Persistence.Repositories;
 
 namespace BusPortal.Web.Controllers
 {
-    [Authorize]
+    //  [Authorize]
     public class BookingsController : Controller
     {
         private readonly IBookingServices _bookingServices;
         private readonly ILineRepository _lineRepository;
 
+
         public BookingsController(IBookingServices bookingServices, ILineRepository lineRepository)
         {
             _bookingServices = bookingServices;
             _lineRepository = lineRepository;
-        }
 
-        public async Task<IActionResult> Add()
+        }
+        //     public async Task<IActionResult> Add()
+        //   {
+        //     var startCities = await _lineRepository.GetAllStartCitiesAsync();
+        //      ViewBag.StartCities = new SelectList(startCities);
+        //     return View();
+        //  }
+
+        [HttpGet]
+        public IActionResult Add()
         {
-            var startCities = await _lineRepository.GetAllStartCitiesAsync();
-            ViewBag.StartCities = new SelectList(startCities);
+            // Check if user is authenticated
+            //    if (!User.Identity.IsAuthenticated)
+            //    {
+            // Store the intended destination
+            //      return RedirectToAction("Login", "Clients", new { ReturnUrl = "/Bookings/Add" });
+            //    }
+
+            // User is authenticated, show the booking form
             return View();
         }
 
@@ -50,11 +65,11 @@ namespace BusPortal.Web.Controllers
                 //var result = await _bookingServices.CreateBookingAsync(model);
                 //if (result.Success)
                 //{
-                    //return RedirectToAction("Index", "Home");
+                //return RedirectToAction("Index", "Home");
                 //}
                 //ModelState.AddModelError("", result.ErrorMessage);
             }
-            
+
             var startCities = await _lineRepository.GetAllStartCitiesAsync();
             ViewBag.StartCities = new SelectList(startCities);
             return View(model);

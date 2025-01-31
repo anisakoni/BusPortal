@@ -1,7 +1,7 @@
 ﻿using AutoMapper; 
 using BusPortal.BLL.Services.Interfaces;
 using BusPortal.BLL.Services.Scoped;
-using Humanizer;
+using BusPortal.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BusPortal.Web.Controllers
@@ -9,15 +9,13 @@ namespace BusPortal.Web.Controllers
     public class ClientsController : Controller
     {
         private readonly IClientService _clientService;
-        private readonly IMapper _mapper; 
         private readonly UserService _userService;
 
 
         public ClientsController(IClientService clientService, IMapper mapper, UserService userService)
         {
             _clientService = clientService ?? throw new ArgumentNullException(nameof(clientService));
-            _mapper = mapper;
-            _userService = userService;
+             _userService = userService;
         }
 
         
@@ -29,13 +27,14 @@ namespace BusPortal.Web.Controllers
 
         
         [HttpPost]
-        public async Task<IActionResult> Register(BusPortal.Web.Models.DTO.RegisterViewModel viewModel)
+        public async Task<IActionResult> Register(RegisterViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
                 var result = await _userService.RegisterUserAsync(viewModel.Email, viewModel.Password, viewModel.Name);
                 if (result.Succeeded)
                 {
+                    await _clientService.RegisterClient(viewModel);
                     return RedirectToAction("Privacy", "Home");
                 }
                 return View(viewModel);
@@ -53,7 +52,7 @@ namespace BusPortal.Web.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Login(BusPortal.Web.Models.DTO.LoginViewModel viewModel)
+        public async Task<IActionResult> Login(LoginViewModel viewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -84,6 +83,78 @@ namespace BusPortal.Web.Controllers
         {
             await _userService.LogoutUserAsync();
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(viewModel);
+            }
+
+            var user = await _userService.FindByEmailAsync(viewModel.Email);
+
+            if (user != null)
+            {
+                await _userService.SendPasswordResetEmailAsync(viewModel.Email);
+            }
+
+            return View("ForgotPasswordConfirmation");
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword(string token, string email)
+        {
+            if (token == null || email == null)
+            {
+                return BadRequest("Invalid password reset token.");
+            }
+            string decodedToken = Uri.UnescapeDataString(token);
+            var model = new ResetPasswordViewModel { Token = decodedToken, Email = email };
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(viewModel);
+            }
+
+            var user = await _userService.FindByEmailAsync(viewModel.Email);
+
+            if (user != null)
+            {
+
+                var isTokenValid = await _userService.VerifyPasswordResetTokenAsync(user, viewModel.Token);
+
+                if (!isTokenValid)
+                {
+                    ModelState.AddModelError(string.Empty, "Invalid or expired token.");
+                    return View(viewModel);
+                }
+                var result = await _userService.ResetUserPasswordAsync(user, viewModel.Token, viewModel.Password);
+
+                if (result.Succeeded)
+                {
+                    return View("ResetPasswordConfirmation");
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
+
+            return View("ResetPasswordConfirmation");
         }
     }
 }

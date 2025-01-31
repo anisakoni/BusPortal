@@ -37,16 +37,16 @@ namespace BusPortal.DAL.Persistence
 
                 entity.HasKey(e => e.Id);
 
-             entity.HasOne(e => e.Line)
-             .WithMany()
-             .HasForeignKey(e => e.Line)
-             .OnDelete(DeleteBehavior.Restrict);
+             //   entity.HasOne(e => e.Line)
+             //.WithMany()
+             //.HasForeignKey(e => e.Line)
+             //.OnDelete(DeleteBehavior.Restrict);
 
 
-                entity.HasOne(b => b.Client)
-            .WithMany()  // Client will have a collection of Bookings
-            .HasForeignKey(b => b.Client)
-            .OnDelete(DeleteBehavior.Restrict);
+            //    entity.HasOne(b => b.Client)
+            //.WithMany()  // Client will have a collection of Bookings
+            //.HasForeignKey(b => b.Client)
+            //.OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

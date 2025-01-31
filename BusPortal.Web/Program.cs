@@ -1,10 +1,20 @@
 using BusPortal.BLL.Domain.Models;
 using BusPortal.BLL.Services;
+using BusPortal.BLL.Services.Interfaces;
+using BusPortal.BLL.Services.Scoped;
+using BusPortal.DAL.Persistence.Repositories;
+using Microsoft.AspNetCore.Identity;
+using BusPortal.DAL.Persistence.Entities;
+using BusPortal.BLL.Mapping;
+using BusPortal.DAL.Persistence;
+using BusPortal.DAL;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.RegisterBLLServices(builder.Configuration);
 builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("StripeSettings"));
+
 
 builder.Services.AddAuthentication()
     .AddCookie(options =>
@@ -20,8 +30,25 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddControllersWithViews();
+builder.Services.AddSingleton<EmailService>();
+
 
 builder.Services.AddHttpContextAccessor();
+
+//Add authentication configuration
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Clients/Login";
+    options.LogoutPath = "/Clients/Logout";
+    options.AccessDeniedPath = "/Clients/AccessDenied";
+    options.Cookie.Name = "BusPortalAuth";
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromHours(24);
+    options.SlidingExpiration = true;
+});
 
 var app = builder.Build();
 

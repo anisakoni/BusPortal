@@ -1,9 +1,5 @@
 ﻿using AutoMapper;
-using BusPortal.Common.Models;
-using BusPortal.Web.Models.DTO;
 using BusPortal.DAL.Persistence.Entities;
-
-using BusPortal.Common.Models;
 namespace BusPortal.Web.Services
 {
     public class MappingProfile : Profile

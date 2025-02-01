@@ -51,7 +51,7 @@ namespace BusPortal.DAL.Migrations
 
                     b.HasIndex("LineId");
 
-                    b.ToTable("Bookings");
+                    b.ToTable("Bookings", (string)null);
                 });
 
             modelBuilder.Entity("BusPortal.DAL.Persistence.Entities.Client", b =>
@@ -77,7 +77,7 @@ namespace BusPortal.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Clients");
+                    b.ToTable("Clients", (string)null);
                 });
 
             modelBuilder.Entity("BusPortal.DAL.Persistence.Entities.Line", b =>
@@ -100,7 +100,7 @@ namespace BusPortal.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Lines");
+                    b.ToTable("Lines", (string)null);
                 });
 
             modelBuilder.Entity("BusPortal.DAL.Persistence.Entities.Payment", b =>
@@ -117,7 +117,7 @@ namespace BusPortal.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

@@ -8,7 +8,7 @@ using BusPortal.DAL.Persistence.Repositories;
 
 namespace BusPortal.Web.Controllers
 {
-    [Authorize]
+   // [Authorize]
     public class BookingsController : Controller
     {
         private readonly IBookingServices _bookingServices;

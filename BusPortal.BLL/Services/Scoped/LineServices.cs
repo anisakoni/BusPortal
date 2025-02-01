@@ -17,19 +17,6 @@ namespace BusPortal.BLL.Services.Scoped
             _lineRepository = lineRepository ?? throw new ArgumentNullException(nameof(lineRepository));
         }
 
-        //public async Task AddLineAsync(AddLineViewModel viewModel)
-        //{
-        //    var line = new Line
-        //    {
-        //        Id = Guid.NewGuid(),
-        //        StartCity = viewModel.StartCity,
-        //        DestinationCity = viewModel.DestinationCity,
-        //        DepartureTimes = viewModel.DepartureTimes,
-        //    };
-
-        //    await _lineRepository.AddAsync(line);
-        //    await _lineRepository.SaveChangesAsync(); 
-        //}
         public async Task AddLineAsync(AddLineViewModel viewModel)
         {
             var line = new Line
@@ -38,26 +25,21 @@ namespace BusPortal.BLL.Services.Scoped
                 StartCity = viewModel.StartCity,
                 DestinationCity = viewModel.DestinationCity,
                 DepartureTimes = viewModel.DepartureTimes,
-                Price = viewModel.Price // Include Price
+                Price = (int)viewModel.Price 
             };
             await _lineRepository.AddAsync(line);
             await _lineRepository.SaveChangesAsync();
         }
 
-
         public async Task<List<Line>> GetAllLinesAsync()
         {
-            return await _lineRepository.GetAllAsync(); 
+            return await _lineRepository.GetAllAsync();
         }
 
-        //public async Task<Line> GetLineByIdAsync(Guid id)
-        //{
-        //    return await _lineRepository.GetByIdAsync(id); 
-        //}
         public async Task<Line?> GetLineByIdAsync(Guid id)
         {
             var line = await _lineRepository.GetByIdAsync(id);
-            return line; // Just return null if not found, don’t throw an exception
+            return line;
         }
 
         public async Task UpdateLineAsync(Line viewModel)
@@ -69,27 +51,24 @@ namespace BusPortal.BLL.Services.Scoped
                 line.StartCity = viewModel.StartCity;
                 line.DestinationCity = viewModel.DestinationCity;
                 line.DepartureTimes = viewModel.DepartureTimes;
+                line.Price = (int)viewModel.Price;
 
-                _lineRepository.Update(line); 
+                _lineRepository.Update(line);
                 await _lineRepository.SaveChangesAsync();
             }
         }
 
         public async Task DeleteLineAsync(Guid id)
         {
-            
-                var line = await _lineRepository.GetByIdAsync(id);
-                if (line == null)
-                {
-                    throw new InvalidOperationException("Line not found.");
-                }
+            var line = await _lineRepository.GetByIdAsync(id);
+            if (line == null)
+            {
+                throw new InvalidOperationException("Line not found.");
+            }
 
-                _lineRepository.Remove(line);
-                await _lineRepository.SaveChangesAsync();
-           
-
+            _lineRepository.Remove(line);
+            await _lineRepository.SaveChangesAsync();
         }
-
 
         async Task<List<Domain.Models.Line>> ILinesService.GetAllLinesAsync()
         {
@@ -103,7 +82,8 @@ namespace BusPortal.BLL.Services.Scoped
                     Id = line.Id,
                     StartCity = line.StartCity,
                     DestinationCity = line.DestinationCity,
-                    DepartureTimes = line.DepartureTimes
+                    DepartureTimes = line.DepartureTimes,
+                    Price = (int)line.Price 
                 });
             }
 
@@ -124,7 +104,8 @@ namespace BusPortal.BLL.Services.Scoped
                 Id = line.Id,
                 StartCity = line.StartCity,
                 DestinationCity = line.DestinationCity,
-                DepartureTimes = line.DepartureTimes
+                DepartureTimes = line.DepartureTimes,
+                Price = (int)line.Price 
             };
         }
 
@@ -137,6 +118,7 @@ namespace BusPortal.BLL.Services.Scoped
                 line.StartCity = viewModel.StartCity;
                 line.DestinationCity = viewModel.DestinationCity;
                 line.DepartureTimes = viewModel.DepartureTimes;
+                line.Price = (int)viewModel.Price; 
 
                 _lineRepository.Update(line);
                 await _lineRepository.SaveChangesAsync();

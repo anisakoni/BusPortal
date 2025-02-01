@@ -25,34 +25,6 @@ namespace BusPortal.Web.Controllers
             return View();
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Add(AddLineViewModel viewModel)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        await _linesService.AddLineAsync(viewModel);
-        //        return RedirectToAction("List");
-        //    }
-
-        //    return View(viewModel);
-        //}
-
-        //[HttpGet]
-        //public async Task<IActionResult> List()
-        //{
-        //    var lines = await _linesService.GetAllLinesAsync();
-
-        //    // Konverton BLL model ne Web.Entities model
-        //    var mappedLines = lines.Select(line => new Line
-        //    {
-        //        Id = line.Id,
-        //        StartCity = line.StartCity,
-        //        DestinationCity = line.DestinationCity,
-        //        DepartureTimes = line.DepartureTimes
-        //    }).ToList();
-
-        //    return View(mappedLines);
-        //}
         [HttpPost]
         public async Task<IActionResult> Add(AddLineViewModel viewModel)
         {
@@ -63,6 +35,7 @@ namespace BusPortal.Web.Controllers
             }
             return View(viewModel);
         }
+
         [HttpGet]
         public async Task<IActionResult> List()
         {
@@ -73,11 +46,10 @@ namespace BusPortal.Web.Controllers
                 StartCity = line.StartCity,
                 DestinationCity = line.DestinationCity,
                 DepartureTimes = line.DepartureTimes,
-                Price = line.Price // Include Price
+                Price = line.Price 
             }).ToList();
             return View(mappedLines);
         }
-
 
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
@@ -86,16 +58,17 @@ namespace BusPortal.Web.Controllers
 
             if (line == null)
             {
-                return View("NotFound"); 
+                return View("NotFound");
             }
 
-            // Konverton BLL model ne Web.Entities model
-            var mappedLine = new BusPortal.Web.Models.Entities.Line
+           
+            var mappedLine = new Line
             {
                 Id = line.Id,
                 StartCity = line.StartCity,
                 DestinationCity = line.DestinationCity,
-                DepartureTimes = line.DepartureTimes
+                DepartureTimes = line.DepartureTimes,
+                Price = line.Price 
             };
 
             return View(mappedLine);
@@ -111,7 +84,8 @@ namespace BusPortal.Web.Controllers
                     Id = viewModel.Id,
                     StartCity = viewModel.StartCity,
                     DestinationCity = viewModel.DestinationCity,
-                    DepartureTimes = viewModel.DepartureTimes
+                    DepartureTimes = viewModel.DepartureTimes,
+                    Price = viewModel.Price 
                 };
 
                 await _linesService.UpdateLineAsync(lineToUpdate);
@@ -127,6 +101,5 @@ namespace BusPortal.Web.Controllers
             await _linesService.DeleteLineAsync(id);
             return RedirectToAction("List");
         }
-
     }
 }

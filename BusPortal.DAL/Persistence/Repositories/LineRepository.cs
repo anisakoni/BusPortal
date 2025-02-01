@@ -50,7 +50,6 @@ namespace BusPortal.DAL.Persistence.Repositories
             {
                 throw new ArgumentNullException(nameof(line), "Line cannot be null.");
             }
-
             _dbContext.Set<Line>().Remove(line);
         }
 

@@ -1,7 +1,4 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@model List<BusPortal.Web.Models.Entities.Line>
+﻿@model List<BusPortal.Web.Models.Entities.Line>
 
 <h1>Lines</h1>
 <table class="table">
@@ -21,7 +18,7 @@
                 <td>@line.StartCity</td>
                 <td>@line.DestinationCity</td>
                 <td>@line.DepartureTimes</td>
-                <td>@line.Price.ToString("C")</td> <!-- Display price formatted as currency -->
+                <td>@line.Price</td> <!-- Display price as integer -->
                 <td>
                     <a class="btn btn-primary" asp-controller="Lines" asp-action="Edit" asp-route-id="@line.Id">Edit</a>
 

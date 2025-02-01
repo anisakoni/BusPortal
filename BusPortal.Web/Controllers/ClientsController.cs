@@ -52,7 +52,7 @@ namespace BusPortal.Web.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel viewModel)
+        public async Task<IActionResult> Login(BusPortal.Web.Models.DTO.LoginViewModel viewModel)
         {
             if (!ModelState.IsValid)
             {

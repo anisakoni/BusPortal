@@ -17,6 +17,19 @@ namespace BusPortal.BLL.Services.Scoped
             _lineRepository = lineRepository ?? throw new ArgumentNullException(nameof(lineRepository));
         }
 
+        //public async Task AddLineAsync(AddLineViewModel viewModel)
+        //{
+        //    var line = new Line
+        //    {
+        //        Id = Guid.NewGuid(),
+        //        StartCity = viewModel.StartCity,
+        //        DestinationCity = viewModel.DestinationCity,
+        //        DepartureTimes = viewModel.DepartureTimes,
+        //    };
+
+        //    await _lineRepository.AddAsync(line);
+        //    await _lineRepository.SaveChangesAsync(); 
+        //}
         public async Task AddLineAsync(AddLineViewModel viewModel)
         {
             var line = new Line
@@ -25,11 +38,12 @@ namespace BusPortal.BLL.Services.Scoped
                 StartCity = viewModel.StartCity,
                 DestinationCity = viewModel.DestinationCity,
                 DepartureTimes = viewModel.DepartureTimes,
+                Price = viewModel.Price // Include Price
             };
-
             await _lineRepository.AddAsync(line);
-            await _lineRepository.SaveChangesAsync(); 
+            await _lineRepository.SaveChangesAsync();
         }
+
 
         public async Task<List<Line>> GetAllLinesAsync()
         {

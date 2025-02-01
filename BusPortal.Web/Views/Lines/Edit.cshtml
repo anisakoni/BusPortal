@@ -1,4 +1,6 @@
-﻿@*@ For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860 *@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
 @{
     ViewData["Title"] = "Edit Line";
 }
@@ -19,6 +21,7 @@ else
             <label class="form-label">Id</label>
             <input type="text" class="form-control" asp-for="Id" readonly />
         </div>
+
         <div class="mt-3">
             <label class="form-label">Start City</label>
             <input type="text" class="form-control" asp-for="StartCity" required />
@@ -32,6 +35,11 @@ else
         <div class="mt-3">
             <label class="form-label">Departure Times</label>
             <input type="text" class="form-control" asp-for="DepartureTimes" required />
+        </div>
+
+        <div class="mt-3">
+            <label class="form-label">Price</label>
+            <input type="number" class="form-control" asp-for="Price" step="0.01" required />
         </div>
 
         <div class="mt-3">

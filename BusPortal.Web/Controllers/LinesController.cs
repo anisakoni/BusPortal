@@ -25,6 +25,34 @@ namespace BusPortal.Web.Controllers
             return View();
         }
 
+        //[HttpPost]
+        //public async Task<IActionResult> Add(AddLineViewModel viewModel)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        await _linesService.AddLineAsync(viewModel);
+        //        return RedirectToAction("List");
+        //    }
+
+        //    return View(viewModel);
+        //}
+
+        //[HttpGet]
+        //public async Task<IActionResult> List()
+        //{
+        //    var lines = await _linesService.GetAllLinesAsync();
+
+        //    // Konverton BLL model ne Web.Entities model
+        //    var mappedLines = lines.Select(line => new Line
+        //    {
+        //        Id = line.Id,
+        //        StartCity = line.StartCity,
+        //        DestinationCity = line.DestinationCity,
+        //        DepartureTimes = line.DepartureTimes
+        //    }).ToList();
+
+        //    return View(mappedLines);
+        //}
         [HttpPost]
         public async Task<IActionResult> Add(AddLineViewModel viewModel)
         {
@@ -33,28 +61,24 @@ namespace BusPortal.Web.Controllers
                 await _linesService.AddLineAsync(viewModel);
                 return RedirectToAction("List");
             }
-
             return View(viewModel);
         }
-
         [HttpGet]
         public async Task<IActionResult> List()
         {
             var lines = await _linesService.GetAllLinesAsync();
-
-            // Konverton BLL model ne Web.Entities model
             var mappedLines = lines.Select(line => new Line
             {
                 Id = line.Id,
                 StartCity = line.StartCity,
                 DestinationCity = line.DestinationCity,
-                DepartureTimes = line.DepartureTimes
+                DepartureTimes = line.DepartureTimes,
+                Price = line.Price // Include Price
             }).ToList();
-
             return View(mappedLines);
         }
 
-       
+
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {

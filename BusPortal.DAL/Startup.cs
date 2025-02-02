@@ -25,6 +25,6 @@ public static class Startup
         services.AddScoped<IClientRepository, ClientRepository>();
         services.AddScoped<UserRepository>();
 
-        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        //services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
     }
 }

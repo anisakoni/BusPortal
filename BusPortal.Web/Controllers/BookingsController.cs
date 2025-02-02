@@ -8,7 +8,7 @@ using BusPortal.DAL.Persistence.Repositories;
 
 namespace BusPortal.Web.Controllers
 {
-    //  [Authorize]
+   // [Authorize]
     public class BookingsController : Controller
     {
         private readonly IBookingServices _bookingServices;
@@ -47,9 +47,12 @@ namespace BusPortal.Web.Controllers
         //populating `ViewBag.OccupiedSeats` with the correct data
      public async Task<IActionResult> Add()
         {
-            
+            var startCities = await _lineRepository.GetAllStartCitiesAsync();
+            ViewBag.StartCities = new SelectList(startCities);
+            ViewBag.DestinationCities = new SelectList(new List<string>());
 
-          var occupiedSeats = await _bookingServices.GetOccupiedSeatsAsync();
+
+            var occupiedSeats = await _bookingServices.GetOccupiedSeatsAsync();
           ViewBag.OccupiedSeats = occupiedSeats;
            return View();
         }
@@ -77,8 +80,11 @@ namespace BusPortal.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetDestinationCities(string startCity)
         {
-            var destinationCities = await _lineRepository.GetDestinationCitiesForStartCityAsync(startCity);
-            return Json(destinationCities);
+            
+               
+             var destinationCities = await _lineRepository.GetDestinationCitiesForStartCityAsync(startCity);
+             return Json(destinationCities);
+            
         }
 
         [HttpPost]
@@ -93,12 +99,18 @@ var line = await _lineRepository.GetLineByRouteAsync(model.StartCity, model.Dest
                     ModelState.AddModelError("", "Selected route is not available");
                     return View(model);
                }
-
-            }
-
+              var result = _bookingServices.AddBooking(model, User.Identity.Name, model.Seat);
+                if (!result.Success)
+                {
+                    ModelState.AddModelError("", result.ErrorMessage);
+                    return View(model);
+                }
+                    return RedirectToAction("Success");
+                }
             var startCities = await _lineRepository.GetAllStartCitiesAsync();
             ViewBag.StartCities = new SelectList(startCities);
             return View(model);
+
         }
    }
 }

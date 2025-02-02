@@ -79,7 +79,8 @@ namespace BusPortal.BLL.Services.Scoped
 
 
                 }
-                var line = _lineRepository.GetAll().FirstOrDefault();
+                var line = _lineRepository.GetAll()
+                    .FirstOrDefault(l=>l.StartCity==viewModel.StartCity && l.DestinationCity==viewModel.DestinationCity);
                 if (line == null)
                 {
                     return (false, "The specified route does not exist.");
@@ -91,7 +92,7 @@ namespace BusPortal.BLL.Services.Scoped
                     Client = client,
                     Line = line,
                     DateTime = viewModel.DateTime,
-                    Seat = viewModel.Seat,
+                    Seat = seat,
                     Price = viewModel.Price,
                 };
                 _bookingRepository.Add(booking);

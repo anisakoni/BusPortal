@@ -4,6 +4,7 @@ using BusPortal.DAL.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusPortal.DAL.Migrations
 {
     [DbContext(typeof(DALDbContext))]
-    partial class DALDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250201202311_fix priceee")]
+    partial class fixpriceee
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,9 +40,6 @@ namespace BusPortal.DAL.Migrations
                     b.Property<Guid>("LineId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("PaymentId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
@@ -53,8 +53,6 @@ namespace BusPortal.DAL.Migrations
                     b.HasIndex("ClientId");
 
                     b.HasIndex("LineId");
-
-                    b.HasIndex("PaymentId");
 
                     b.ToTable("Bookings");
                 });
@@ -340,17 +338,9 @@ namespace BusPortal.DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BusPortal.DAL.Persistence.Entities.Payment", "Payment")
-                        .WithMany()
-                        .HasForeignKey("PaymentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Client");
 
                     b.Navigation("Line");
-
-                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

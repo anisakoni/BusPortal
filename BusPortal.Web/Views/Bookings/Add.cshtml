@@ -150,26 +150,29 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"</script>
         <script>
-            $(document).ready(function () {
-                $('#startCitySelect').change(function () {
-                    var startCity = $(this).val();
-                    var destinationSelect = $('#destinationCitySelect');
-
-                    destinationSelect.empty();
-                    destinationSelect.append($('<option></option>').val('').text('Select Destination City'));
-
-                    if (startCity) {
-                        $.getJSON('/Bookings/GetDestinationCities', { startCity: startCity }, function (cities) {
-                            $.each(cities, function (i, city) {
-                                destinationSelect.append($('<option></option>').val(city).text(city));
+		$(document).ready(function() {
+			$('#startCitySelect').change(function() {
+				var startCity = $(this).val();
+				if(startCity) {
+					$.getJSON('@Url.Action("GetDestinationCities", "Booking")', { startCity: startCity }, function(data) {
+						var destinationSelect = $('#destinationCitySelect');
+                        destinationSelect.empty();
+						destinationSelect.append($('<option value="">Select Destination City</option>'));
+						$.each(data, function(index, item) {
+							destinationSelect.append($('<option value="' + item + '">' + item + '</option>'));
+							});
                             });
-                            destinationSelect.prop('disabled', false);
-                        });
-                    } else {
-                        destinationSelect.prop('disabled', true);
-                    }
-                });
+							}
+                            else{
+							$('#destinationCitySelect').empty().append('<option value="">Select Destination City</option>');
+							}
+							});
+							});
+
+
+            
 
                 $('.seat').click(function() {
                     if ($(this).hasClass('occupied')) {

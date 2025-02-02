@@ -25,20 +25,21 @@ namespace BusPortal.BLL.Services.Scoped
                 StartCity = viewModel.StartCity,
                 DestinationCity = viewModel.DestinationCity,
                 DepartureTimes = viewModel.DepartureTimes,
+                Price = (int)viewModel.Price 
             };
-
             await _lineRepository.AddAsync(line);
-            await _lineRepository.SaveChangesAsync(); 
+            await _lineRepository.SaveChangesAsync();
         }
 
         public async Task<List<Line>> GetAllLinesAsync()
         {
-            return await _lineRepository.GetAllAsync(); 
+            return await _lineRepository.GetAllAsync();
         }
 
-        public async Task<Line> GetLineByIdAsync(Guid id)
+        public async Task<Line?> GetLineByIdAsync(Guid id)
         {
-            return await _lineRepository.GetByIdAsync(id); 
+            var line = await _lineRepository.GetByIdAsync(id);
+            return line;
         }
 
         public async Task UpdateLineAsync(Line viewModel)
@@ -50,8 +51,9 @@ namespace BusPortal.BLL.Services.Scoped
                 line.StartCity = viewModel.StartCity;
                 line.DestinationCity = viewModel.DestinationCity;
                 line.DepartureTimes = viewModel.DepartureTimes;
+                line.Price = (int)viewModel.Price;
 
-                _lineRepository.Update(line); 
+                _lineRepository.Update(line);
                 await _lineRepository.SaveChangesAsync();
             }
         }
@@ -59,15 +61,15 @@ namespace BusPortal.BLL.Services.Scoped
         public async Task DeleteLineAsync(Guid id)
         {
             var line = await _lineRepository.GetByIdAsync(id);
-
-            if (line != null)
+            if (line == null)
             {
-                _lineRepository.Remove(line); 
-                await _lineRepository.SaveChangesAsync();
+                throw new InvalidOperationException("Line not found.");
             }
+
+            _lineRepository.Remove(line);
+            await _lineRepository.SaveChangesAsync();
         }
 
-       
         async Task<List<Domain.Models.Line>> ILinesService.GetAllLinesAsync()
         {
             var lines = await _lineRepository.GetAllAsync();
@@ -80,7 +82,8 @@ namespace BusPortal.BLL.Services.Scoped
                     Id = line.Id,
                     StartCity = line.StartCity,
                     DestinationCity = line.DestinationCity,
-                    DepartureTimes = line.DepartureTimes
+                    DepartureTimes = line.DepartureTimes,
+                    Price = (int)line.Price 
                 });
             }
 
@@ -101,7 +104,8 @@ namespace BusPortal.BLL.Services.Scoped
                 Id = line.Id,
                 StartCity = line.StartCity,
                 DestinationCity = line.DestinationCity,
-                DepartureTimes = line.DepartureTimes
+                DepartureTimes = line.DepartureTimes,
+                Price = (int)line.Price 
             };
         }
 
@@ -114,6 +118,7 @@ namespace BusPortal.BLL.Services.Scoped
                 line.StartCity = viewModel.StartCity;
                 line.DestinationCity = viewModel.DestinationCity;
                 line.DepartureTimes = viewModel.DepartureTimes;
+                line.Price = (int)viewModel.Price; 
 
                 _lineRepository.Update(line);
                 await _lineRepository.SaveChangesAsync();

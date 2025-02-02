@@ -89,10 +89,14 @@
             <input asp-for="DateTime" class="form-control" />
             <span asp-validation-for="DateTime" class="text-danger"></span>
         </div>
-        <button type="submit" class="btn btn-primary">Create Booking</button>
-    </form>
-</div>
+   <!-- <button type="submit" class="btn btn-primary">Create Booking</button>-->
+<form asp-action="Add" method="post" id="booking-form">
+    <!-- Existing form fields -->
 
+    <button type="submit" class="btn btn-primary" id="checkout-button">Create Booking</button>
+</form>
+</form>
+</div>
 <style>
     .bus-layout {
         background: #f8f9fa;
@@ -196,8 +200,31 @@
                 });
             });
         </script>
-}
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    $(document).ready(function() {
+        $('#checkout-button').click(function(event) {
+            event.preventDefault();
 
+            $.ajax({
+                url: '@Url.Action("CreateCheckoutSession", "Home")',
+                method: 'POST',
+                success: function(response) {
+                    var stripe = Stripe('pk_test_51LEw9tSDgbzoG4N8Fx534MJg07PbUcvLhzG6slO8Wk0pkkxkity5uQV81M0vkFU4b3ejQBAuGVJwLVMSxlzHU2AD002bHsYXEC');
+                    stripe.redirectToCheckout({ sessionId: response.id });
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Something went wrong with the payment process!'
+                    });
+                }
+            });
+        });
+    });
+</script>
+}
 @if (TempData["SuccessMessage"] != null)
 {
         <div class="alert alert-success mt-3">

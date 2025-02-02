@@ -7,6 +7,8 @@ using Stripe;
 using System.Diagnostics;
 using Microsoft.Extensions.Options;
 
+using Microsoft.Extensions.Options;
+
 namespace BusPortal.Web.Controllers
 {
     public class HomeController : Controller
@@ -40,10 +42,10 @@ namespace BusPortal.Web.Controllers
                 var successUrl = Url.Action("Success", "Home", null, Request.Scheme);
                 var cancelUrl = Url.Action("Cancel", "Home", null, Request.Scheme);
 
-               
+                
                 StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
 
-             
+               
                 var options = new SessionCreateOptions
                 {
                     PaymentMethodTypes = new List<string> { "card" },
@@ -54,7 +56,7 @@ namespace BusPortal.Web.Controllers
                             PriceData = new SessionLineItemPriceDataOptions
                             {
                                 Currency = currency,
-                                UnitAmount = amount, 
+                                UnitAmount = amount,
                                 ProductData = new SessionLineItemPriceDataProductDataOptions
                                 {
                                     Name = "Bus Ticket"
@@ -68,11 +70,11 @@ namespace BusPortal.Web.Controllers
                     CancelUrl = cancelUrl
                 };
 
-                // Create Stripe session
+               
                 var service = new SessionService();
                 var session = service.Create(options);
 
-                // Redirect to Stripe checkout URL
+               
                 return Redirect(session.Url);
             }
             catch (Exception ex)
@@ -99,6 +101,10 @@ namespace BusPortal.Web.Controllers
         }
     }
 }
+
+
+
+
 
 
 

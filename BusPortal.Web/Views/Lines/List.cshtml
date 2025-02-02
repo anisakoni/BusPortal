@@ -8,6 +8,7 @@
             <th>Destination City</th>
             <th>Departure Time</th>
             <th>Price</th>
+            <!--   <th>Date</th> -->
             <th>Actions</th>
         </tr>
     </thead>
@@ -18,7 +19,10 @@
                 <td>@line.StartCity</td>
                 <td>@line.DestinationCity</td>
                 <td>@line.DepartureTimes</td>
-                <td>@line.Price</td> <!-- Display price as integer -->
+                <td>@line.Price</td>
+                <!-- <td>line.Date.ToString("yyyy-MM-dd")</td> -->
+                <!--  shto nje at siper -->
+               
                 <td>
                     <a class="btn btn-primary" asp-controller="Lines" asp-action="Edit" asp-route-id="@line.Id">Edit</a>
 

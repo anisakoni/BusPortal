@@ -15,5 +15,7 @@ namespace BusPortal.BLL.Services.Interfaces
         Task<Line> GetLineByIdAsync(Guid id);
         Task UpdateLineAsync(Line viewModel);
         Task DeleteLineAsync(Guid id);
+        Task<IEnumerable<string>> GetAllStartCitiesAsync();
+        Task<IEnumerable<string>> GetDestinationCitiesForStartCityAsync(string startCity);
     }
 }

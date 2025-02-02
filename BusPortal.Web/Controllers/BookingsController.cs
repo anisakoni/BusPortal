@@ -14,15 +14,20 @@ namespace BusPortal.Web.Controllers
     {
         private readonly IBookingServices _bookingServices;
         private readonly ILineRepository _lineRepository;
+        private readonly ILinesService _linesService;
 
-        public BookingsController(IBookingServices bookingServices, ILineRepository lineRepository)
+
+        public BookingsController(IBookingServices bookingServices, ILineRepository lineRepository, ILinesService linesService)
         {
             _bookingServices = bookingServices;
             _lineRepository = lineRepository;
+            _linesService = linesService;
+
         }
 
-        // Method to fetch available seats for a specific route or booking
-        public async Task<IActionResult> ViewAvailableSeats(string startCity, string destinationCity, DateTime dateTime, string seat)
+
+
+    public async Task<IActionResult> ViewAvailableSeats(string startCity, string destinationCity, DateTime dateTime, string seat)
         {
             var line = await _lineRepository.GetLineByRouteAsync(startCity, destinationCity);
             if (line == null)
@@ -35,8 +40,7 @@ namespace BusPortal.Web.Controllers
             return View(availableSeats);
         }
 
-        // Method to load the booking form with available start and destination cities
-        public async Task<IActionResult> Add()
+     public async Task<IActionResult> Add()
         {
             var startCities = await _lineRepository.GetAllStartCitiesAsync();
             ViewBag.StartCities = new SelectList(startCities);
@@ -48,16 +52,41 @@ namespace BusPortal.Web.Controllers
             return View();
         }
 
-        // API to fetch destination cities dynamically based on selected start city
+  //      [HttpGet]
+   //     public IActionResult Add()
+       // {
+            // Check if user is authenticated
+            //    if (!User.Identity.IsAuthenticated)
+            //    {
+            // Store the intended destination
+            //      return RedirectToAction("Login", "Clients", new { ReturnUrl = "/Bookings/Add" });
+            //    }
+
+            // User is authenticated, show the booking form
+        //    return View();
+      //  }
+
+            //    }
+
+            // User is authenticated, show the booking form
+        //    return View();
+      //  }
+
+            //    }
+
+            // User is authenticated, show the booking form
+        //    return View();
+      //  }
+
         [HttpGet]
         public async Task<IActionResult> GetDestinationCities(string startCity)
         {
 
                 // Get the destination cities related to the start city
                 var destinationCities = _lineRepository.GetDestinationCitiesForStartCityAsync(startCity);
-                
 
-                // Return the result as a JSON response
+            var line = await _lineRepository.GetLineByRouteAsync(model.StartCity, model.DestinationCity);
+              if (line == null)
                 return Json(destinationCities); 
             
         }
@@ -67,8 +96,9 @@ namespace BusPortal.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                var line = await _lineRepository.GetLineByRouteAsync(model.StartCity, model.DestinationCity);
-                if (line == null)
+
+var line = await _lineRepository.GetLineByRouteAsync(model.StartCity, model.DestinationCity);
+              if (line == null)
                 {
                     ModelState.AddModelError("", "Selected route is not available");
                     return View(model);

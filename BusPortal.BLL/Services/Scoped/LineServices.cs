@@ -141,5 +141,19 @@ namespace BusPortal.BLL.Services.Scoped
             return await _lineRepository.GetDestinationCitiesForStartCityAsync(startCity);
         }
 
+        public async Task<IEnumerable<string>> GetAllStartCitiesAsync()
+        {
+            return await _lineRepository.GetAllStartCitiesAsync();
+        }
+
+        public async Task<IEnumerable<string>> GetDestinationCitiesForStartCityAsync(string startCity)
+        {
+            return await _lineRepository.GetDestinationCitiesForStartCityAsync(startCity);
+        }
+
+        public async Task<Line> GetLineByRouteAsync(string startCity, string destinationCity)
+        {
+            return await _lineRepository.GetLineByRouteAsync(startCity, destinationCity);
+        }
     }
 }

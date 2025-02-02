@@ -49,7 +49,7 @@ namespace BusPortal.Web.Controllers
                 DestinationCity = line.DestinationCity,
                 DepartureTimes = line.DepartureTimes,
                 Price = line.Price
-                //Date=line.Date
+            
             }).ToList();
             return View(mappedLines);
         }
@@ -72,7 +72,7 @@ namespace BusPortal.Web.Controllers
                 DestinationCity = line.DestinationCity,
                 DepartureTimes = line.DepartureTimes,
                 Price = line.Price
-                // Date = line.Date
+            
             };
 
             return View(mappedLine);
@@ -90,7 +90,7 @@ namespace BusPortal.Web.Controllers
                     DestinationCity = viewModel.DestinationCity,
                     DepartureTimes = viewModel.DepartureTimes,
                     Price = viewModel.Price
-                    // Date = viewModel.Date
+                  
                 };
 
                 await _linesService.UpdateLineAsync(lineToUpdate);

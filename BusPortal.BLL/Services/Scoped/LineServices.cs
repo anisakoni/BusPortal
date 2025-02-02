@@ -141,19 +141,29 @@ namespace BusPortal.BLL.Services.Scoped
             return await _lineRepository.GetDestinationCitiesForStartCityAsync(startCity);
         }
 
-        public async Task<IEnumerable<string>> GetAllStartCitiesAsync()
-        {
-            return await _lineRepository.GetAllStartCitiesAsync();
-        }
+       
 
-        public async Task<IEnumerable<string>> GetDestinationCitiesForStartCityAsync(string startCity)
+        async Task<Domain.Models.Line> ILinesService.GetLineByRouteAsync(string startCity, string destinationCity)
         {
-            return await _lineRepository.GetDestinationCitiesForStartCityAsync(startCity);
-        }
+           
+            var line = await _lineRepository.GetLineByRouteAsync(startCity, destinationCity);
 
-        public async Task<Line> GetLineByRouteAsync(string startCity, string destinationCity)
-        {
-            return await _lineRepository.GetLineByRouteAsync(startCity, destinationCity);
+           
+            if (line != null)
+            {
+                return new Domain.Models.Line
+                {
+                    Id = line.Id,
+                    StartCity = line.StartCity,
+                    DestinationCity = line.DestinationCity,
+                    DepartureTimes = line.DepartureTimes,
+                    Price = line.Price
+                 
+                };
+            }
+
+            
+            return null;
         }
     }
 }

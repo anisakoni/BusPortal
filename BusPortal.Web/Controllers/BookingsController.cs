@@ -1,9 +1,7 @@
-using BusPortal.BLL.Services.Scoped;
-using Microsoft.AspNetCore.Mvc;
 using BusPortal.BLL.Services.Interfaces;
 using BusPortal.Common.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using BusPortal.DAL.Persistence.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -13,23 +11,17 @@ namespace BusPortal.Web.Controllers
     public class BookingsController : Controller
     {
         private readonly IBookingServices _bookingServices;
-        private readonly ILineRepository _lineRepository;
         private readonly ILinesService _linesService;
 
-
-        public BookingsController(IBookingServices bookingServices, ILineRepository lineRepository, ILinesService linesService)
+        public BookingsController(IBookingServices bookingServices, ILinesService linesService)
         {
             _bookingServices = bookingServices;
-            _lineRepository = lineRepository;
             _linesService = linesService;
-
         }
 
-
-
-    public async Task<IActionResult> ViewAvailableSeats(string startCity, string destinationCity, DateTime dateTime, string seat)
+        public async Task<IActionResult> ViewAvailableSeats(string startCity, string destinationCity, DateTime dateTime, string seat)
         {
-            var line = await _lineRepository.GetLineByRouteAsync(startCity, destinationCity);
+            var line = await _linesService.GetLineByRouteAsync(startCity, destinationCity);  // Using _linesService
             if (line == null)
             {
                 ModelState.AddModelError("", "Selected route is not available");
@@ -40,11 +32,10 @@ namespace BusPortal.Web.Controllers
             return View(availableSeats);
         }
 
-     public async Task<IActionResult> Add()
+        public async Task<IActionResult> Add()
         {
-            var startCities = await _lineRepository.GetAllStartCitiesAsync();
+            var startCities = await _linesService.GetAllStartCitiesAsync();  // Using _linesService
             ViewBag.StartCities = new SelectList(startCities);
-            ViewBag.DestinationCities = new SelectList(new List<string>()); // Empty initially
 
             var occupiedSeats = await _bookingServices.GetOccupiedSeatsAsync();
             ViewBag.OccupiedSeats = occupiedSeats;
@@ -52,43 +43,11 @@ namespace BusPortal.Web.Controllers
             return View();
         }
 
-  //      [HttpGet]
-   //     public IActionResult Add()
-       // {
-            // Check if user is authenticated
-            //    if (!User.Identity.IsAuthenticated)
-            //    {
-            // Store the intended destination
-            //      return RedirectToAction("Login", "Clients", new { ReturnUrl = "/Bookings/Add" });
-            //    }
-
-            // User is authenticated, show the booking form
-        //    return View();
-      //  }
-
-            //    }
-
-            // User is authenticated, show the booking form
-        //    return View();
-      //  }
-
-            //    }
-
-            // User is authenticated, show the booking form
-        //    return View();
-      //  }
-
         [HttpGet]
         public async Task<IActionResult> GetDestinationCities(string startCity)
         {
-
-                // Get the destination cities related to the start city
-                var destinationCities = _lineRepository.GetDestinationCitiesForStartCityAsync(startCity);
-
-            var line = await _lineRepository.GetLineByRouteAsync(model.StartCity, model.DestinationCity);
-              if (line == null)
-                return Json(destinationCities); 
-            
+            var destinationCities = await _linesService.GetDestinationCitiesForStartCityAsync(startCity);  // Using _linesService
+            return Json(destinationCities);
         }
 
         [HttpPost]
@@ -96,9 +55,8 @@ namespace BusPortal.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-
-var line = await _lineRepository.GetLineByRouteAsync(model.StartCity, model.DestinationCity);
-              if (line == null)
+                var line = await _linesService.GetLineByRouteAsync(model.StartCity, model.DestinationCity);  // Using _linesService
+                if (line == null)
                 {
                     ModelState.AddModelError("", "Selected route is not available");
                     return View(model);
@@ -115,12 +73,12 @@ var line = await _lineRepository.GetLineByRouteAsync(model.StartCity, model.Dest
             }
 
             // Reload start and destination cities if the form submission fails
-            var startCities = await _lineRepository.GetAllStartCitiesAsync();
+            var startCities = await _linesService.GetAllStartCitiesAsync();  // Using _linesService
             ViewBag.StartCities = new SelectList(startCities);
 
             if (!string.IsNullOrWhiteSpace(model.StartCity))
             {
-                var destinationCities = await _lineRepository.GetDestinationCitiesForStartCityAsync(model.StartCity);
+                var destinationCities = await _linesService.GetDestinationCitiesForStartCityAsync(model.StartCity);  // Using _linesService
                 ViewBag.DestinationCities = new SelectList(destinationCities);
             }
             else

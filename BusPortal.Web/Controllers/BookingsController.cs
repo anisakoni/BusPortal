@@ -13,12 +13,14 @@ namespace BusPortal.Web.Controllers
     {
         private readonly IBookingServices _bookingServices;
         private readonly ILineRepository _lineRepository;
+        private readonly ILinesService _linesService;
 
 
-        public BookingsController(IBookingServices bookingServices, ILineRepository lineRepository)
+        public BookingsController(IBookingServices bookingServices, ILineRepository lineRepository, ILinesService linesService)
         {
             _bookingServices = bookingServices;
             _lineRepository = lineRepository;
+            _linesService = linesService;
 
         }
         //     public async Task<IActionResult> Add()
@@ -30,7 +32,6 @@ namespace BusPortal.Web.Controllers
 
 
 
-        //method to fetch available seats for a specific route or booking
     public async Task<IActionResult> ViewAvailableSeats(string startCity, string destinationCity, DateTime dateTime, string seat)
         {
             var line = await _lineRepository.GetLineByRouteAsync(startCity, destinationCity);
@@ -44,7 +45,6 @@ namespace BusPortal.Web.Controllers
             
         }
 
-        //populating `ViewBag.OccupiedSeats` with the correct data
      public async Task<IActionResult> Add()
         {
             var startCities = await _lineRepository.GetAllStartCitiesAsync();
@@ -56,12 +56,6 @@ namespace BusPortal.Web.Controllers
           ViewBag.OccupiedSeats = occupiedSeats;
            return View();
         }
-
-        
-
-
-
-
 
   //      [HttpGet]
    //     public IActionResult Add()
@@ -93,7 +87,7 @@ namespace BusPortal.Web.Controllers
             if (ModelState.IsValid)
             {
 
-var line = await _lineRepository.GetLineByRouteAsync(model.StartCity, model.DestinationCity);
+            var line = await _lineRepository.GetLineByRouteAsync(model.StartCity, model.DestinationCity);
               if (line == null)
                 {
                     ModelState.AddModelError("", "Selected route is not available");

@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Stripe.Checkout;
 using Stripe;
 using System.Diagnostics;
-
 using Microsoft.Extensions.Options;
 
 namespace BusPortal.Web.Controllers
@@ -35,16 +34,16 @@ namespace BusPortal.Web.Controllers
         {
             try
             {
-                // Default values for bus ticket payment
-                var amount = 1000; // Example amount in smallest currency unit (e.g., cents for USD)
-                var currency = "usd"; // Payment currency
+                
+                var amount = 1000; 
+                var currency = "usd"; 
                 var successUrl = Url.Action("Success", "Home", null, Request.Scheme);
                 var cancelUrl = Url.Action("Cancel", "Home", null, Request.Scheme);
 
-                // Configure Stripe API key
+               
                 StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
 
-                // Create session options for payment
+             
                 var options = new SessionCreateOptions
                 {
                     PaymentMethodTypes = new List<string> { "card" },
@@ -55,13 +54,13 @@ namespace BusPortal.Web.Controllers
                             PriceData = new SessionLineItemPriceDataOptions
                             {
                                 Currency = currency,
-                                UnitAmount = amount, // Amount is directly set here (in cents)
+                                UnitAmount = amount, 
                                 ProductData = new SessionLineItemPriceDataProductDataOptions
                                 {
                                     Name = "Bus Ticket"
                                 }
                             },
-                            Quantity = 1 // Quantity of tickets being purchased
+                            Quantity = 1 
                         }
                     },
                     Mode = "payment",
@@ -100,6 +99,7 @@ namespace BusPortal.Web.Controllers
         }
     }
 }
+
 
 
 

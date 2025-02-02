@@ -35,7 +35,7 @@ namespace BusPortal.Web.Controllers
                 if (result.Succeeded)
                 {
                     await _clientService.RegisterClient(viewModel);
-                    return RedirectToAction("Privacy", "Home");
+                    return RedirectToAction("Add", "Bookings");
                 }
                 return View(viewModel);
             }
@@ -60,10 +60,9 @@ namespace BusPortal.Web.Controllers
             }
 
             var result = await _userService.LoginUserAsync(viewModel.Username, viewModel.Password, viewModel.RememberMe);
-
             if (result.Succeeded)
             {
-                return RedirectToAction("Privacy", "Home");
+                return RedirectToAction("Add", "Bookings");
             }
 
             if (result.IsLockedOut)

@@ -2,6 +2,7 @@
 using BusPortal.BLL.Services.Interfaces;
 using BusPortal.Common.Models;
 using BusPortal.Web.Models.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -10,6 +11,7 @@ using Line = BusPortal.Web.Models.Entities.Line;
 
 namespace BusPortal.Web.Controllers
 {
+    //[Authorize(Roles = "Admin")]
     public class LinesController : Controller
     {
         private readonly ILinesService _linesService;
@@ -46,7 +48,8 @@ namespace BusPortal.Web.Controllers
                 StartCity = line.StartCity,
                 DestinationCity = line.DestinationCity,
                 DepartureTimes = line.DepartureTimes,
-                Price = line.Price 
+                Price = line.Price
+            
             }).ToList();
             return View(mappedLines);
         }
@@ -68,7 +71,8 @@ namespace BusPortal.Web.Controllers
                 StartCity = line.StartCity,
                 DestinationCity = line.DestinationCity,
                 DepartureTimes = line.DepartureTimes,
-                Price = line.Price 
+                Price = line.Price
+            
             };
 
             return View(mappedLine);
@@ -85,7 +89,8 @@ namespace BusPortal.Web.Controllers
                     StartCity = viewModel.StartCity,
                     DestinationCity = viewModel.DestinationCity,
                     DepartureTimes = viewModel.DepartureTimes,
-                    Price = viewModel.Price 
+                    Price = viewModel.Price
+                  
                 };
 
                 await _linesService.UpdateLineAsync(lineToUpdate);

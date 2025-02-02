@@ -154,26 +154,24 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"</script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script>
 		$(document).ready(function() {
-			$('#startCitySelect').change(function() {
-				var startCity = $(this).val();
-				if(startCity) {
-					$.getJSON('@Url.Action("GetDestinationCities", "Booking")', { startCity: startCity }, function(data) {
-						var destinationSelect = $('#destinationCitySelect');
-                        destinationSelect.empty();
-						destinationSelect.append($('<option value="">Select Destination City</option>'));
-						$.each(data, function(index, item) {
-							destinationSelect.append($('<option value="' + item + '">' + item + '</option>'));
-							});
-                            });
-							}
-                            else{
-							$('#destinationCitySelect').empty().append('<option value="">Select Destination City</option>');
-							}
-							});
-							});
+			$('#startCitySelect').change(function () {
+        var startCity = $(this).val();
+        if (startCity) {
+            $.getJSON('@Url.Action("GetDestinationCities", "Bookings")', { startCity: startCity }, function (data) {
+                var destinationSelect = $('#destinationCitySelect');
+                destinationSelect.empty();
+                destinationSelect.append('<option value="">Select Destination City</option>');
+                $.each(data, function (index, item) {
+                    destinationSelect.append('<option value="' + item + '">' + item + '</option>');
+                });
+            });
+        } else {
+            $('#destinationCitySelect').empty().append('<option value="">Select Destination City</option>');
+        }
+    });
 
 
             

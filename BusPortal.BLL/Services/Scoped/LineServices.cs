@@ -2,6 +2,7 @@
 using BusPortal.Common.Models;
 using BusPortal.DAL.Persistence.Entities;
 using BusPortal.DAL.Persistence.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -25,7 +26,8 @@ namespace BusPortal.BLL.Services.Scoped
                 StartCity = viewModel.StartCity,
                 DestinationCity = viewModel.DestinationCity,
                 DepartureTimes = viewModel.DepartureTimes,
-                Price = (int)viewModel.Price 
+                Price = viewModel.Price
+                // Date = viewModel.Date
             };
             await _lineRepository.AddAsync(line);
             await _lineRepository.SaveChangesAsync();
@@ -51,7 +53,8 @@ namespace BusPortal.BLL.Services.Scoped
                 line.StartCity = viewModel.StartCity;
                 line.DestinationCity = viewModel.DestinationCity;
                 line.DepartureTimes = viewModel.DepartureTimes;
-                line.Price = (int)viewModel.Price;
+                line.Price =viewModel.Price;
+                // line.Date = viewModel.Date;
 
                 _lineRepository.Update(line);
                 await _lineRepository.SaveChangesAsync();
@@ -83,7 +86,8 @@ namespace BusPortal.BLL.Services.Scoped
                     StartCity = line.StartCity,
                     DestinationCity = line.DestinationCity,
                     DepartureTimes = line.DepartureTimes,
-                    Price = (int)line.Price 
+                    Price = line.Price
+                   //  Date = line.Date
                 });
             }
 
@@ -105,7 +109,8 @@ namespace BusPortal.BLL.Services.Scoped
                 StartCity = line.StartCity,
                 DestinationCity = line.DestinationCity,
                 DepartureTimes = line.DepartureTimes,
-                Price = (int)line.Price 
+                Price = line.Price
+                //Date=line.Date
             };
         }
 
@@ -118,11 +123,47 @@ namespace BusPortal.BLL.Services.Scoped
                 line.StartCity = viewModel.StartCity;
                 line.DestinationCity = viewModel.DestinationCity;
                 line.DepartureTimes = viewModel.DepartureTimes;
-                line.Price = (int)viewModel.Price; 
+                line.Price = viewModel.Price;
+                //line.Date=viewModel.Date;
 
                 _lineRepository.Update(line);
                 await _lineRepository.SaveChangesAsync();
             }
+        }
+
+        public async Task<IEnumerable<string>> GetAllStartCitiesAsync()
+        {
+            return await _lineRepository.GetAllStartCitiesAsync();
+        }
+
+        public async Task<IEnumerable<string>> GetDestinationCitiesForStartCityAsync(string startCity)
+        {
+            return await _lineRepository.GetDestinationCitiesForStartCityAsync(startCity);
+        }
+
+       
+
+        async Task<Domain.Models.Line> ILinesService.GetLineByRouteAsync(string startCity, string destinationCity)
+        {
+           
+            var line = await _lineRepository.GetLineByRouteAsync(startCity, destinationCity);
+
+           
+            if (line != null)
+            {
+                return new Domain.Models.Line
+                {
+                    Id = line.Id,
+                    StartCity = line.StartCity,
+                    DestinationCity = line.DestinationCity,
+                    DepartureTimes = line.DepartureTimes,
+                    Price = line.Price
+                 
+                };
+            }
+
+            
+            return null;
         }
     }
 }

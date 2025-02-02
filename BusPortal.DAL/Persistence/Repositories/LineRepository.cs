@@ -63,24 +63,24 @@ namespace BusPortal.DAL.Persistence.Repositories
             _dbContext.Update(entity);
         }
 
-        public async Task<IEnumerable<string>> GetAllStartCitiesAsync()
-        {
-            return await _dbContext.Lines
-                .Select(l => l.StartCity)
-                .Distinct()
-                .OrderBy(c => c)
-                .ToListAsync();
-        }
+        //public async Task<IEnumerable<string>> GetAllStartCitiesAsync()
+        //{
+        //    return await _dbContext.Lines
+        //        .Select(l => l.StartCity)
+        //        .Distinct()
+        //        .OrderBy(c => c)
+        //        .ToListAsync();
+        //}
 
-        public async Task<IEnumerable<string>> GetDestinationCitiesForStartCityAsync(string startCity)
-        {
-            return await _dbContext.Lines
-                .Where(l => l.StartCity == startCity)
-                .Select(l => l.DestinationCity)
-                .Distinct()
-                .OrderBy(c => c)
-                .ToListAsync();
-        }
+        //public async Task<IEnumerable<string>> GetDestinationCitiesForStartCityAsync(string startCity)
+        //{
+        //    return await _dbContext.Lines
+        //        .Where(l => l.StartCity == startCity)
+        //        .Select(l => l.DestinationCity)
+        //        .Distinct()
+        //        .OrderBy(c => c)
+        //        .ToListAsync();
+        //}
 
         public async Task<Line> GetLineByRouteAsync(string startCity, string destinationCity)
         {
@@ -88,5 +88,30 @@ namespace BusPortal.DAL.Persistence.Repositories
                 .FirstOrDefaultAsync(l => l.StartCity == startCity &&
                                           l.DestinationCity == destinationCity);
         }
+        public async Task<IEnumerable<string>> GetAllStartCitiesAsync()
+        {
+            return await _dbContext.Lines
+                .Where(l => !string.IsNullOrEmpty(l.StartCity)) 
+                .Select(l => l.StartCity.Trim()) 
+                .Distinct()
+                .OrderBy(c => c)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<string>> GetDestinationCitiesForStartCityAsync(string startCity)
+        {
+            if (string.IsNullOrWhiteSpace(startCity))
+            {
+                throw new ArgumentException("Start city cannot be null or empty.", nameof(startCity));
+            }
+
+            return await _dbContext.Lines
+                .Where(l => l.StartCity == startCity && !string.IsNullOrEmpty(l.DestinationCity)) 
+                .Select(l => l.DestinationCity.Trim())
+                .Distinct()
+                .OrderBy(c => c)
+                .ToListAsync();
+        }
+
     }
 }

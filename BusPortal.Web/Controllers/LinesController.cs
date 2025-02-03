@@ -4,6 +4,7 @@ using BusPortal.Common.Models;
 using BusPortal.Web.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http; 
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -24,17 +25,32 @@ namespace BusPortal.Web.Controllers
         [HttpGet]
         public IActionResult Add()
         {
+            var clientData = Request.Cookies["ClientData"];
+
+            if (clientData == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Add(AddLineViewModel viewModel)
         {
+            var clientData = Request.Cookies["ClientData"];
+
+            if (clientData == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             if (ModelState.IsValid)
             {
                 await _linesService.AddLineAsync(viewModel);
                 return RedirectToAction("List");
             }
+
             return View(viewModel);
         }
 
@@ -49,11 +65,12 @@ namespace BusPortal.Web.Controllers
                 DestinationCity = line.DestinationCity,
                 DepartureTimes = line.DepartureTimes,
                 Price = line.Price
-            
             }).ToList();
+
             return View(mappedLines);
         }
 
+       
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
@@ -64,7 +81,7 @@ namespace BusPortal.Web.Controllers
                 return View("NotFound");
             }
 
-           
+            
             var mappedLine = new Line
             {
                 Id = line.Id,
@@ -72,14 +89,14 @@ namespace BusPortal.Web.Controllers
                 DestinationCity = line.DestinationCity,
                 DepartureTimes = line.DepartureTimes,
                 Price = line.Price
-            
             };
 
-            return View(mappedLine);
+            return View(mappedLine); 
         }
 
+       
         [HttpPost]
-        public async Task<IActionResult> Edit(Domain.Models.Line viewModel)
+        public async Task<IActionResult> Edit(Line viewModel) 
         {
             if (ModelState.IsValid)
             {
@@ -90,14 +107,13 @@ namespace BusPortal.Web.Controllers
                     DestinationCity = viewModel.DestinationCity,
                     DepartureTimes = viewModel.DepartureTimes,
                     Price = viewModel.Price
-                  
                 };
 
                 await _linesService.UpdateLineAsync(lineToUpdate);
                 return RedirectToAction("List");
             }
 
-            return View(viewModel);
+            return View(viewModel); 
         }
 
         [HttpPost]

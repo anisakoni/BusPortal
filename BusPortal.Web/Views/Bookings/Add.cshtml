@@ -177,6 +177,25 @@
                 }
             });
 
+            $('#destinationCitySelect').change(function (){
+                var startCity = $('#startCitySelect').val();
+                var destinationCity = $(this).val();
+                if(startCity && destinationCity){
+                    $.getJSON('@Url.Action("GetDepartureTimes", "Bookings")',
+                    { startCity: startCity, destinationCity: destinationCity}, function (data){
+                        var departureTimesSelect = $('#DepartureTimes');
+                        departureTimesSelect.empty();
+                        departureTimesSelect.append('<option value="">Departure Time</option>');
+                        $.each(data, function (index, item){
+                            departureTimesSelect.append('<option value="' + item + '">' + item + '</option>');
+                        });
+                    });
+                } else{
+                    $('#DepartureTimes').empty()
+                    .append('<option value="">Departure Time</option>');
+                }
+            });
+
             $('#startCitySelect, #destinationCitySelect').change(function () {
                 var startCity = $('#startCitySelect').val();
                 var destinationCity = $('#destinationCitySelect').val();
@@ -211,22 +230,23 @@
                     });
                 }
             });
-        });
-$('#createBookingBtn').click(function () {
-    var startCity = $('#startCitySelect').val();
-    var destinationCity = $('#destinationCitySelect').val();
-    var price = $('#priceInput').val();
 
-    if (startCity && destinationCity && price) {
-        window.location.href = '@Url.Action("CreateCheckoutSession", "Home")?startCity=' + startCity + '&destinationCity=' + destinationCity + '&price=' + price;
-    } else {
-        Swal.fire({
-            icon: 'error',
-            title: 'Oops...',
-            text: 'Please select both start and destination city, and ensure the price is available.'
+            $('#createBookingBtn').click(function () {
+                var startCity = $('#startCitySelect').val();
+                var destinationCity = $('#destinationCitySelect').val();
+                var price = $('#priceInput').val();
+
+                if (startCity && destinationCity && price) {
+                    window.location.href = '@Url.Action("CreateCheckoutSession", "Home")?startCity=' + startCity + '&destinationCity=' + destinationCity + '&price=' + price;
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Please select both start and destination city, and ensure the price is available.'
+                    });
+                }
+            });
         });
-    }
-});
     </script>
 }
 @if (TempData["SuccessMessage"] != null)

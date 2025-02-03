@@ -50,6 +50,15 @@ namespace BusPortal.Web.Controllers
             return Json(destinationCities);
         }
 
+        public async Task<IActionResult> GetDepartureTimes(string startCity, string destinationCity)
+        {
+            var line = await _linesService.GetLineByRouteAsync(startCity, destinationCity);
+            if(line != null)
+            {
+                return Json(new { departureTimes = line.DepartureTimes });
+            }
+            return Json(new { departureTimes = string.Empty });
+        }
         [HttpPost]
         public async Task<IActionResult> Add(AddBookingViewModel model)
         {

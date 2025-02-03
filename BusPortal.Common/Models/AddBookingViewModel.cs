@@ -27,6 +27,8 @@ namespace BusPortal.Common.Models
         [Required(ErrorMessage = "Date is required")]
         public DateTime DateTime { get; set; }
 
+        [Required(ErrorMessage = "Departure time is required")]
+        public string DepartureTimes { get; set; }
 
     }
 }

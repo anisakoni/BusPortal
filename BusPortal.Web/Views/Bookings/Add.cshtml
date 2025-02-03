@@ -84,6 +84,16 @@
             <input asp-for="Price" class="form-control" />
             <span asp-validation-for="Price" class="text-danger"></span>
         </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="DepartureTimes">Available Departure Time</label>
+            <select asp-for="DepartureTimes"
+                    class="form-control"
+                    id="DepartureTimes">
+                <option value="">Departure Time</option>
+            </select>
+            <span asp-validation-for="DepartureTimes" class="text-danger"></span>
+        </div>
         <div class="form-group mb-3">
             <label asp-for="DateTime">Date</label>
             <input asp-for="DateTime" class="form-control" />
@@ -166,6 +176,27 @@
             });
         } else {
             $('#destinationCitySelect').empty().append('<option value="">Select Destination City</option>');
+        }
+    });
+
+
+
+    $('#destinationCitySelect').change(function (){
+        var startCity = $('#startCitySelect').val();
+        var destinationCity = $(this).val();
+        if(startCity && destinationCity){
+            $.getJSON('@Url.Action("GetDepartureTimes", "Bookings")',
+{ startCity: startCity, destinationCity: destinationCity}, function (data){
+var departureTimesSelect = $('#DepartureTimes');
+departureTimesSelect.empty();
+departureTimesSelect.append('<option value="">Departure Time</option>');
+$.each(data, function (index, item){
+    departureTimesSelect.append('<option value="' + item + '">' + item + '</option>');
+});
+        });
+        } else{
+            $('#DepartureTimes').empty()
+            .append('<option value="">Departure Time</option>');
         }
     });
 

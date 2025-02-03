@@ -16,7 +16,8 @@ namespace BusPortal.BLL.Services.Interfaces
 
         Task<IEnumerable<int>> GetAvailableSeatAsync(Guid Id, DateTime dateTime);
         Task<IEnumerable<int>> GetOccupiedSeatsAsync();
-        
+        Task<IEnumerable<string>> GetAvailableDepartureTimesAsync(string startCity, string destinationCity);
+
 
 
 

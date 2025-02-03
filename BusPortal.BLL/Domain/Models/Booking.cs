@@ -13,7 +13,7 @@ namespace BusPortal.BLL.Domain.Models
         public required Line Line { get; set; }
         public DateTime DateTime { get; set; }
         public required string Seat { get; set; }
-        public decimal Price { get; set; }
+       // public decimal Price { get; set; }
 
     }
 }

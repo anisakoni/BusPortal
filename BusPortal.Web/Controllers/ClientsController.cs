@@ -35,7 +35,7 @@ namespace BusPortal.Web.Controllers
                 if (result.Succeeded)
                 {
                     await _clientService.RegisterClient(viewModel);
-                    return RedirectToAction("Add", "Bookings");
+                    return RedirectToAction("Login", "Clients");
                 }
                 return View(viewModel);
             }

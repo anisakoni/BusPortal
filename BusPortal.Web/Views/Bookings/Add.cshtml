@@ -80,6 +80,16 @@
             <input asp-for="Price" class="form-control" id="priceInput" readonly />
             <span asp-validation-for="Price" class="text-danger"></span>
         </div>
+
+        <div class="form-group mb-3">
+            <label asp-for="DepartureTimes">Available Departure Time</label>
+            <select asp-for="DepartureTimes"
+                    class="form-control"
+                    id="DepartureTimes">
+                <option value="">Departure Time</option>
+            </select>
+            <span asp-validation-for="DepartureTimes" class="text-danger"></span>
+        </div>
         <div class="form-group mb-3">
             <label asp-for="DateTime">Date</label>
             <input asp-for="DateTime" class="form-control" />

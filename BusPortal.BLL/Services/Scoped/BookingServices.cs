@@ -64,7 +64,15 @@ namespace BusPortal.BLL.Services.Scoped
               return occupiedSeats;
 
          }
-
+        public async Task<IEnumerable<string>> GetAvailableDepartureTimesAsync(string startCity, string destinationCity)
+        {
+            var booking = await _bookingRepository.GetAsync();
+            var availableTimes = booking
+                .Where(b => b.Line.StartCity == startCity && b.Line.DestinationCity == destinationCity)
+                .Select(b => b.Line.DepartureTimes)
+                .Distinct();
+            return availableTimes;
+        }
 
         //add seat selection system
         public (bool Success, string? ErrorMessage) AddBooking(AddBookingViewModel viewModel, string userName, string seat)
@@ -93,7 +101,7 @@ namespace BusPortal.BLL.Services.Scoped
                     Line = line,
                     DateTime = viewModel.DateTime,
                     Seat = seat,
-                    Price = viewModel.Price,
+                  //  Price = viewModel.Price,
                 };
                 _bookingRepository.Add(booking);
                 return (true, null);
@@ -109,49 +117,5 @@ namespace BusPortal.BLL.Services.Scoped
 
         }
         
-     
-
-
-
-
-
-
-        //  public (bool Success, string? ErrorMessage) AddBooking(AddBookingViewModel viewModel, string userName)
-        //   {
-        //     try
-        //     {
-        //        var client = _clientRepository.GetAll().FirstOrDefault(c => c.Name == userName);
-        //        if (client == null)
-        //        {
-        //            return (false, "Client not found for the logged-in user.");
-        //          }
-
-        //     var line = _lineRepository.GetAll().FirstOrDefault();
-        //     if (line == null)
-        //     {
-        //          return (false, "The specified route does not exist.");
-        //      }
-
-        //       var booking = new Booking
-        //       {
-        //          Id = Guid.NewGuid(),
-        //         Client = client,
-        //         Line = line,
-        //         DateTime = viewModel.DateTime,
-        //       Seat = viewModel.Seat,
-        //       Price = viewModel.Price,
-
-        //    };
-
-        //     _bookingRepository.Add(booking);
-        //    return (true, null);
-        // }
-        //   catch (Exception ex)
-        //   {
-        // Log the exception as needed
-        //      return (false, "An unexpected error occurred while creating the booking.");
-        //  }
-        // }
-        // }
     }
 }

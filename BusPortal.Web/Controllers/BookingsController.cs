@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace BusPortal.Web.Controllers
 {
@@ -34,6 +35,11 @@ namespace BusPortal.Web.Controllers
 
         public async Task<IActionResult> Add()
         {
+            var clientData = Request.Cookies["ClientData"];
+            if (clientData == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             var startCities = await _linesService.GetAllStartCitiesAsync();  // Using _linesService
             ViewBag.StartCities = new SelectList(startCities);
 
@@ -62,6 +68,11 @@ namespace BusPortal.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(AddBookingViewModel model)
         {
+            var clientData = Request.Cookies["ClientData"];
+            if (clientData == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             if (ModelState.IsValid)
             {
                 var line = await _linesService.GetLineByRouteAsync(model.StartCity, model.DestinationCity);  // Using _linesService

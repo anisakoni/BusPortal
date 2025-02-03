@@ -28,26 +28,23 @@
             <label asp-for="DestinationCity">Destination City</label>
             <select asp-for="DestinationCity" 
             class="form-control" 
-            id="destinationCitySelect" 
-            >
+            id="destinationCitySelect">
                 <option value="">Select Destination City</option>
             </select>
             <span asp-validation-for="DestinationCity" class="text-danger"></span>
         </div>
-
         <div class="form-group mt-3">
             <label>Select Your Seat</label>
             @using System.Linq
 
             @{
                 bool IsOccupied(string seat){
-					var occupiedSeatsList = ViewBag.OccupiedSeats as List<string>;
-					if (occupiedSeatsList != null)
-					{
-						return occupiedSeatsList.Any(occupiedSeat => occupiedSeat.Trim() == seat);
-					}
-					return false;
-                
+                    var occupiedSeatsList = ViewBag.OccupiedSeats as List<string>;
+                    if (occupiedSeatsList != null)
+                    {
+                        return occupiedSeatsList.Any(occupiedSeat => occupiedSeat.Trim() == seat);
+                    }
+                    return false;
                 }
             }
             <div class="bus-layout">
@@ -78,20 +75,20 @@
                     
             <input type="hidden" id="selectedSeat" name="Seat" required />
         </div>
- <div class="form-group mb-3">
-     <label asp-for="Price">Price</label>
-     <input asp-for="Price" class="form-control" />
-     <span asp-validation-for="Price" class="text-danger"></span>
- </div>
-      
+          <div class="form-group mb-3">
+            <label asp-for="Price">Price</label>
+            <input asp-for="Price" class="form-control" id="priceInput" readonly />
+            <span asp-validation-for="Price" class="text-danger"></span>
+        </div>
         <div class="form-group mb-3">
             <label asp-for="DateTime">Date</label>
             <input asp-for="DateTime" class="form-control" />
             <span asp-validation-for="DateTime" class="text-danger"></span>
         </div>
-    <button type="submit" class="btn btn-primary">Create Booking</button>
-</form>
+<button type="button" class="btn btn-primary" id="createBookingBtn">Create Booking</button>
+    </form>
 </div>
+
 <style>
     .bus-layout {
         background: #f8f9fa;
@@ -150,53 +147,81 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script>
-		$(document).ready(function() {
-			$('#startCitySelect').change(function () {
-        var startCity = $(this).val();
-        if (startCity) {
-            $.getJSON('@Url.Action("GetDestinationCities", "Bookings")', { startCity: startCity }, function (data) {
-                var destinationSelect = $('#destinationCitySelect');
-                destinationSelect.empty();
-                destinationSelect.append('<option value="">Select Destination City</option>');
-                $.each(data, function (index, item) {
-                    destinationSelect.append('<option value="' + item + '">' + item + '</option>');
-                });
-            });
-        } else {
-            $('#destinationCitySelect').empty().append('<option value="">Select Destination City</option>');
-        }
-    });
-
-
-            
-
-                $('.seat').click(function() {
-                    if ($(this).hasClass('occupied')) {
-                        return;
-                    }
-
-                    $('.seat').removeClass('selected');
-                    $(this).addClass('selected');
-                    $('#selectedSeat').val($(this).data('seat'));
-                });
-
-                $('form').submit(function(e) {
-                    if (!$('#selectedSeat').val()) {
-                        e.preventDefault();
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'Please select a seat!'
+    <script>
+        $(document).ready(function() {
+            $('#startCitySelect').change(function () {
+                var startCity = $(this).val();
+                if (startCity) {
+                    $.getJSON('@Url.Action("GetDestinationCities", "Bookings")', { startCity: startCity }, function (data) {
+                        var destinationSelect = $('#destinationCitySelect');
+                        destinationSelect.empty();
+                        destinationSelect.append('<option value="">Select Destination City</option>');
+                        $.each(data, function (index, item) {
+                            destinationSelect.append('<option value="' + item + '">' + item + '</option>');
                         });
-                    }
-                });
+                    }).fail(function() {
+                        $('#destinationCitySelect').empty().append('<option value="">Select Destination City</option>');
+                    });
+                } else {
+                    $('#destinationCitySelect').empty().append('<option value="">Select Destination City</option>');
+                }
             });
-        </script>
+
+            $('#startCitySelect, #destinationCitySelect').change(function () {
+                var startCity = $('#startCitySelect').val();
+                var destinationCity = $('#destinationCitySelect').val();
+                if (startCity && destinationCity) {
+                    $.getJSON('@Url.Action("GetPrice", "Home")', { startCity: startCity, destinationCity: destinationCity }, function (data) {
+                        $('#priceInput').val(data);
+                    }).fail(function() {
+                        $('#priceInput').val('');
+                    });
+                } else {
+                    $('#priceInput').val('');
+                }
+            });
+
+            $('.seat').click(function() {
+                if ($(this).hasClass('occupied')) {
+                    return;
+                }
+
+                $('.seat').removeClass('selected');
+                $(this).addClass('selected');
+                $('#selectedSeat').val($(this).data('seat'));
+            });
+
+            $('form').submit(function(e) {
+                if (!$('#selectedSeat').val()) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Please select a seat!'
+                    });
+                }
+            });
+        });
+$('#createBookingBtn').click(function () {
+    var startCity = $('#startCitySelect').val();
+    var destinationCity = $('#destinationCitySelect').val();
+    var price = $('#priceInput').val();
+
+    if (startCity && destinationCity && price) {
+        window.location.href = '@Url.Action("CreateCheckoutSession", "Home")?startCity=' + startCity + '&destinationCity=' + destinationCity + '&price=' + price;
+    } else {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Please select both start and destination city, and ensure the price is available.'
+        });
+    }
+});
+    </script>
 }
 @if (TempData["SuccessMessage"] != null)
 {
-        <div class="alert alert-success mt-3">
+    <div class="alert alert-success mt-3">
         @TempData["SuccessMessage"]
-        </div>
+    </div>
 }

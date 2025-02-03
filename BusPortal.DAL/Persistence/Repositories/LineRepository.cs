@@ -18,6 +18,7 @@ namespace BusPortal.DAL.Persistence.Repositories
         Task<IEnumerable<string>> GetAllStartCitiesAsync();
         Task<IEnumerable<string>> GetDestinationCitiesForStartCityAsync(string startCity);
         Task<Line> GetLineByRouteAsync(string startCity, string destinationCity);
+        Task<decimal?> GetPriceByRouteAsync(string startCity, string destinationCity);
     }
 
     internal class LineRepository : _BaseRepository<Line, Guid>, ILineRepository
@@ -63,36 +64,18 @@ namespace BusPortal.DAL.Persistence.Repositories
             _dbContext.Update(entity);
         }
 
-        //public async Task<IEnumerable<string>> GetAllStartCitiesAsync()
-        //{
-        //    return await _dbContext.Lines
-        //        .Select(l => l.StartCity)
-        //        .Distinct()
-        //        .OrderBy(c => c)
-        //        .ToListAsync();
-        //}
-
-        //public async Task<IEnumerable<string>> GetDestinationCitiesForStartCityAsync(string startCity)
-        //{
-        //    return await _dbContext.Lines
-        //        .Where(l => l.StartCity == startCity)
-        //        .Select(l => l.DestinationCity)
-        //        .Distinct()
-        //        .OrderBy(c => c)
-        //        .ToListAsync();
-        //}
-
         public async Task<Line> GetLineByRouteAsync(string startCity, string destinationCity)
         {
             return await _dbContext.Lines
                 .FirstOrDefaultAsync(l => l.StartCity == startCity &&
                                           l.DestinationCity == destinationCity);
         }
+
         public async Task<IEnumerable<string>> GetAllStartCitiesAsync()
         {
             return await _dbContext.Lines
-                .Where(l => !string.IsNullOrEmpty(l.StartCity)) 
-                .Select(l => l.StartCity.Trim()) 
+                .Where(l => !string.IsNullOrEmpty(l.StartCity))
+                .Select(l => l.StartCity.Trim())
                 .Distinct()
                 .OrderBy(c => c)
                 .ToListAsync();
@@ -106,12 +89,18 @@ namespace BusPortal.DAL.Persistence.Repositories
             }
 
             return await _dbContext.Lines
-                .Where(l => l.StartCity == startCity && !string.IsNullOrEmpty(l.DestinationCity)) 
+                .Where(l => l.StartCity == startCity && !string.IsNullOrEmpty(l.DestinationCity))
                 .Select(l => l.DestinationCity.Trim())
                 .Distinct()
                 .OrderBy(c => c)
                 .ToListAsync();
         }
 
+        public async Task<decimal?> GetPriceByRouteAsync(string startCity, string destinationCity)
+        {
+            var line = await _dbContext.Lines
+                .FirstOrDefaultAsync(l => l.StartCity == startCity && l.DestinationCity == destinationCity);
+            return line?.Price;
+        }
     }
 }

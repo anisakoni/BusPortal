@@ -3,22 +3,22 @@ using BusPortal.BLL.Services.Interfaces;
 using BusPortal.BLL.Services.Scoped;
 using BusPortal.Common.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace BusPortal.Web.Controllers
 {
     public class ClientsController : Controller
     {
         private readonly IClientService _clientService;
-        private readonly UserService _userService;
-
+        private readonly UserService _userService;  
 
         public ClientsController(IClientService clientService, IMapper mapper, UserService userService)
         {
             _clientService = clientService ?? throw new ArgumentNullException(nameof(clientService));
-             _userService = userService;
+            _userService = userService;
         }
 
-        
+
         [HttpGet]
         public IActionResult Register()
         {
@@ -63,6 +63,8 @@ namespace BusPortal.Web.Controllers
 
             var client = await _clientService.FindByName(viewModel.Username);
 
+            SaveClientDataInCookie("ClientData", client);
+
             if (result.Succeeded && client.Admin == false)
             {
                 return RedirectToAction("Add", "Bookings");
@@ -88,6 +90,9 @@ namespace BusPortal.Web.Controllers
         public async Task<IActionResult> Logout()
         {
             await _userService.LogoutUserAsync();
+
+            Response.Cookies.Delete("ClientData");
+
             return RedirectToAction("Index", "Home");
         }
 
@@ -162,5 +167,18 @@ namespace BusPortal.Web.Controllers
 
             return View("ResetPasswordConfirmation");
         }
+        public void SaveClientDataInCookie(string clientName, BLL.Domain.Models.Client client)
+        {
+            var clientData = JsonConvert.SerializeObject(client);
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                Expires = DateTime.Now.AddMinutes(30)
+            };
+
+            Response.Cookies.Append(clientName, clientData, cookieOptions);
+        }
+
     }
 }

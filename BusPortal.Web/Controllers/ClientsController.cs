@@ -60,9 +60,16 @@ namespace BusPortal.Web.Controllers
             }
 
             var result = await _userService.LoginUserAsync(viewModel.Username, viewModel.Password, viewModel.RememberMe);
-            if (result.Succeeded)
+
+            var client = await _clientService.FindByName(viewModel.Username);
+
+            if (result.Succeeded && client.Admin == false)
             {
                 return RedirectToAction("Add", "Bookings");
+            }
+            if (result.Succeeded && client.Admin == true)
+            {
+                return RedirectToAction("List", "Lines");
             }
 
             if (result.IsLockedOut)

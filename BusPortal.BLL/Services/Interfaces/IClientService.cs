@@ -1,4 +1,5 @@
-﻿using BusPortal.Common.Models;
+﻿using BusPortal.BLL.Domain.Models;
+using BusPortal.Common.Models;
 
 namespace BusPortal.BLL.Services.Interfaces
 {
@@ -7,5 +8,6 @@ namespace BusPortal.BLL.Services.Interfaces
         Task<bool> AuthenticateClient(LoginViewModel viewModel);
         Task<bool> RegisterClient(RegisterViewModel viewModel);
         Task Logout();
+        Task<Client?> FindByName(string name);
     }
 }

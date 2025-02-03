@@ -17,12 +17,10 @@ namespace BusPortal.BLL.Services
         private readonly IPasswordHasher<Client> _passwordHasher;
 
         public ClientService(IClientRepository clientRepository, IMapper mapper
-            //, IPasswordHasher<Client> passwordHasher
             )
         {
             _clientRepository = clientRepository ?? throw new ArgumentNullException(nameof(clientRepository));
             _mapper = mapper;
-            //_passwordHasher = passwordHasher ?? throw new ArgumentNullException(nameof(passwordHasher));
         }
 
         public async Task<bool> RegisterClient(RegisterViewModel model)
@@ -65,6 +63,21 @@ namespace BusPortal.BLL.Services
         {
            
             throw new NotImplementedException();
+        }
+
+        async Task<Domain.Models.Client> IClientService.FindByName(string name)
+        {
+            var client = _clientRepository.FindByName(name);
+            if(client!= null){
+                return new Domain.Models.Client
+                {
+                    Name = client.Name,
+                    Admin = client.Admin,
+                    Email = client.Email,
+                    Id = client.Id,
+                };
+            }
+            return null;
         }
     }
 }

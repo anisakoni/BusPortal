@@ -123,7 +123,7 @@ namespace BusPortal.BLL.Services.Scoped
                 line.StartCity = viewModel.StartCity;
                 line.DestinationCity = viewModel.DestinationCity;
                 line.DepartureTimes = viewModel.DepartureTimes;
-                line.Price = viewModel.Price;
+                line.Price = (int)viewModel.Price;
                 //line.Date=viewModel.Date;
 
                 _lineRepository.Update(line);

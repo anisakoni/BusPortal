@@ -1,3 +1,4 @@
+
 using BusPortal.BLL.Domain.Models;
 using BusPortal.Web.Models;
 using BusPortal.Web.Models.DTO;
@@ -53,7 +54,7 @@ namespace BusPortal.Web.Controllers
         {
             try
             {
-                var currency = "usd"; 
+                var currency = "usd";
                 var successUrl = Url.Action("Success", "Home", null, Request.Scheme);
                 var cancelUrl = Url.Action("Cancel", "Home", null, Request.Scheme);
 
@@ -69,7 +70,7 @@ namespace BusPortal.Web.Controllers
                     PriceData = new SessionLineItemPriceDataOptions
                     {
                         Currency = currency,
-                        UnitAmount = (long)(price * 100), 
+                        UnitAmount = (long)(price * 100),
                         ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
                             Name = $"Bus Ticket from {startCity} to {destinationCity}"
@@ -116,7 +117,6 @@ namespace BusPortal.Web.Controllers
         }
     }
 }
-
 
 
 

@@ -33,26 +33,20 @@
             </select>
             <span asp-validation-for="DestinationCity" class="text-danger"></span>
         </div>
+
         <div class="form-group mt-3">
             <label>Select Your Seat</label>
-            @using System.Linq
-
             @{
                 bool IsOccupied(string seat)
                 {
                     var occupiedSeatsList = ViewBag.OccupiedSeats as List<string>;
-                    if (occupiedSeatsList != null)
-                    {
-                        return occupiedSeatsList.Any(occupiedSeat => occupiedSeat.Trim() == seat);
-                    }
-                    return false;
+                    return occupiedSeatsList?.Any(occupiedSeat => occupiedSeat.Trim() == seat) ?? false;
                 }
             }
             <div class="bus-layout">
                 <div class="seats-container">
                     @for (int row = 1; row <= 10; row++)
                     {
-
                         <div class="seat-row">
                             <div class="seat @(IsOccupied($"{row}A") ? "occupied" : "available")" data-seat="@(row)A">
                                 <span>@($"{row}A")</span>
@@ -71,12 +65,11 @@
                     }
                 </div>
             </div>
-
-
             <input type="hidden" id="selectedSeat" name="Seat" required />
         </div>
+
         <div class="form-group mb-3">
-            <label asp-for="Price">Price</label>
+            <label asp-for="Price">Total Price</label>
             <input asp-for="Price" class="form-control" id="priceInput" readonly />
             <span asp-validation-for="Price" class="text-danger"></span>
         </div>
@@ -90,91 +83,17 @@
             </select>
             <span asp-validation-for="DepartureTimes" class="text-danger"></span>
         </div>
+
         <div class="form-group mb-3">
             <label asp-for="DateTime">Date</label>
-            <input asp-for="DateTime" class="form-control" />
+            <input asp-for="DateTime" class="form-control" type="date" />
             <span asp-validation-for="DateTime" class="text-danger"></span>
         </div>
+
         <button type="button" class="btn btn-primary" id="createBookingBtn">Create Booking</button>
     </form>
 </div>
 
-<style>
-    body {
-        font-family: 'Poppins', sans-serif;
-        background-color: #e3f2fd;
-        margin: 0;
-        padding: 0;
-    }
-
-    .container {
-        background: #ffffff;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        max-width: 600px;
-        margin: 40px auto;
-    }
-
-    h2 {
-        color: #0d6efd;
-        text-align: center;
-        margin-bottom: 20px;
-    }
-
-    .bus-layout {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .seat-row {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-
-    .aisle {
-        width: 20px;
-    }
-
-    .seat {
-        width: 50px;
-        height: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: white;
-        border: 2px solid #0d6efd;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-        .seat:hover {
-            background: #e9ecef;
-        }
-
-        .seat.selected {
-            background: #28a745 !important;
-            color: white;
-        }
-
-        .seat.occupied {
-            background: #dc3545 !important;
-            color: white;
-            cursor: not-allowed;
-        }
-
-    .btn {
-        position: relative;
-        z-index: 10; 
-        width: 100%; 
-        padding: 10px;
-        font-size: 16px;
-    }
-</style>
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
@@ -182,163 +101,225 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(document).ready(function () {
-            let selectedSeats = []; // Store selected seats
-            let canSelectSeats = false; // Disable seat selection initially
+            let selectedSeats = [];
+            let canSelectSeats = false;
+            let basePrice = 0;
 
-            // Fetch Destination Cities
             $('#startCitySelect').change(function () {
-                var startCity = $(this).val();
-                canSelectSeats = false; // Reset seat selection state
-                $('.seat').removeClass('selected'); // Clear selected seats
-                selectedSeats = [];
-                $('#selectedSeat').val('');
-
+                const startCity = $(this).val();
+                resetFormFields();
                 if (startCity) {
-                    $.getJSON('@Url.Action("GetDestinationCities", "Bookings")', { startCity: startCity }, function (data) {
-                        var destinationSelect = $('#destinationCitySelect');
-                        destinationSelect.empty();
-                        destinationSelect.append('<option value="">Select Destination City</option>');
-                        $.each(data, function (index, item) {
-                            destinationSelect.append('<option value="' + item + '">' + item + '</option>');
-                        });
-                    }).fail(function () {
-                        $('#destinationCitySelect').empty().append('<option value="">Select Destination City</option>');
-                    });
-                } else {
-                    $('#destinationCitySelect').empty().append('<option value="">Select Destination City</option>');
+                    $.getJSON('@Url.Action("GetDestinationCities", "Bookings")', 
+                        { startCity }, 
+                        data => populateDropdown('#destinationCitySelect', data, 'Select Destination City')
+                    );
                 }
             });
 
-            // Enable Seat Selection After Choosing Destination
             $('#destinationCitySelect').change(function () {
-                var startCity = $('#startCitySelect').val();
-                var destinationCity = $(this).val();
-
+                const startCity = $('#startCitySelect').val();
+                const destinationCity = $(this).val();
                 if (startCity && destinationCity) {
-                    canSelectSeats = true; // Enable seat selection
-                    $.getJSON('@Url.Action("GetDepartureTimes", "Bookings")',
-                        { startCity: startCity, destinationCity: destinationCity }, function (data) {
-                            var departureTimesSelect = $('#DepartureTimes');
-                            departureTimesSelect.empty();
-                            departureTimesSelect.append('<option value="">Departure Time</option>');
-                            $.each(data, function (index, item) {
-                                departureTimesSelect.append('<option value="' + item + '">' + item + '</option>');
-                            });
-                        });
+                    canSelectSeats = true;
+                    getDepartureTimes(startCity, destinationCity);
+                    getPrice(startCity, destinationCity);
                 } else {
-                    canSelectSeats = false; // Disable seat selection again
-                    $('.seat').removeClass('selected');
-                    selectedSeats = [];
-                    $('#selectedSeat').val('');
+                    resetFormFields();
                 }
             });
 
-            // Fetch Price
-            $('#startCitySelect, #destinationCitySelect').change(function () {
-                var startCity = $('#startCitySelect').val();
-                var destinationCity = $('#destinationCitySelect').val();
-                if (startCity && destinationCity) {
-                    $.getJSON('@Url.Action("GetPrice", "Home")', { startCity: startCity, destinationCity: destinationCity }, function (data) {
-                        $('#priceInput').val(data);
-                    }).fail(function () {
-                        $('#priceInput').val('');
-                    });
-                } else {
-                    $('#priceInput').val('');
-                }
-            });
-
-            $('.seat').click(function (event) { 
+            
+            $('.seat').click(function (event) {
                 if (!canSelectSeats) {
-                    event.preventDefault();
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Please select a Start City and Destination City first.'
-                    });
+                    showError('Please select a Start City and Destination City first.');
+                    return;
+                }
+                if ($(this).hasClass('occupied')) return;
+
+                const seatNumber = $(this).data('seat');
+                const isSelected = $(this).hasClass('selected');
+
+                if (!isSelected && selectedSeats.length >= 5) {
+                    showError('You can select up to 5 seats only.');
                     return;
                 }
 
-                if ($(this).hasClass('occupied')) return; // Ignore occupied seats
-
-                let seatNumber = $(this).data('seat');
-
-                if ($(this).hasClass('selected')) {
-                    $(this).removeClass('selected');
-                    selectedSeats = selectedSeats.filter(seat => seat !== seatNumber);
-                } else {
-                    if (selectedSeats.length < 5) {
-                        $(this).addClass('selected');
-                        selectedSeats.push(seatNumber);
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Limit Reached',
-                            text: 'You can select up to 5 seats only.',
-                        });
-                    }
-                }
-
-                $('#selectedSeat').val(selectedSeats.join(',')); // Update form field
+                $(this).toggleClass('selected');
+                updateSelectedSeats(seatNumber, isSelected);
+                updateTotalPrice();
             });
 
-            // Validate and Submit Form
-            $('form').submit(function (e) {
-                var dateTime = $('#DateTime').val();
-                var departureTime = $('#DepartureTimes').val();
-
-                if (!dateTime || !departureTime) {
-                    e.preventDefault();
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Please select a Date and a Departure Time!'
-                    });
-                    return;
-                }
-
-                if (selectedSeats.length === 0) {
-                    e.preventDefault();
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Please select at least one seat!'
-                    });
-                }
-            });
-
-            // Create Booking Button Logic
+           
             $('#createBookingBtn').click(function () {
-                var startCity = $('#startCitySelect').val();
-                var destinationCity = $('#destinationCitySelect').val();
-                var price = $('#priceInput').val();
-                var dateTime = $('#DateTime').val();
-                var departureTime = $('#DepartureTimes').val();
+                const startCity = $('#startCitySelect').val();
+                const destinationCity = $('#destinationCitySelect').val();
+                const price = $('#priceInput').val();
+                const dateTime = $('#DateTime').val();
+                const departureTime = $('#DepartureTimes').val();
 
                 if (!dateTime || !departureTime) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Please select a Date and a Departure Time before proceeding.'
-                    });
+                    showError('Please select a Date and Departure Time.');
                     return;
                 }
 
-                if (startCity && destinationCity && price) {
-                    window.location.href = '@Url.Action("CreateCheckoutSession", "Home")?startCity=' + startCity + '&destinationCity=' + destinationCity + '&price=' + price;
+                if (startCity && destinationCity && price > 0) {
+                    window.location.href = `@Url.Action("CreateCheckoutSession", "Home")?startCity=${startCity}&destinationCity=${destinationCity}&price=${price}`;
                 } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Please select both Start and Destination City, and ensure the price is available.'
-                    });
+                    showError('Please complete all required fields.');
                 }
             });
+
+           
+            function getDepartureTimes(startCity, destinationCity) {
+                $.getJSON('@Url.Action("GetDepartureTimes", "Bookings")', 
+                    { startCity, destinationCity }, 
+                    data => populateTimesDropdown(data)
+                );
+            }
+
+            function getPrice(startCity, destinationCity) {
+                $.getJSON('@Url.Action("GetPrice", "Home")', 
+                    { startCity, destinationCity }, 
+                    data => {
+                        basePrice = data;
+                        updateTotalPrice();
+                    }
+                ).fail(() => {
+                    basePrice = 0;
+                    $('#priceInput').val('');
+                });
+            }
+
+            function updateSelectedSeats(seatNumber, isSelected) {
+                selectedSeats = isSelected 
+                    ? selectedSeats.filter(s => s !== seatNumber)
+                    : [...selectedSeats, seatNumber];
+                $('#selectedSeat').val(selectedSeats.join(','));
+            }
+
+            function updateTotalPrice() {
+                const totalPrice = basePrice * selectedSeats.length;
+                $('#priceInput').val(totalPrice.toFixed(2));
+            }
+
+            function populateTimesDropdown(data) {
+                const times = typeof data === 'string' ? data.split(',') : data;
+                populateDropdown('#DepartureTimes', times, 'Select Departure Time');
+            }
+
+            function populateDropdown(selector, items, defaultText) {
+                const dropdown = $(selector).empty().append(`<option value="">${defaultText}</option>`);
+                items.forEach(item => dropdown.append(`<option value="${item}">${item}</option>`));
+            }
+
+            function resetFormFields() {
+                canSelectSeats = false;
+                selectedSeats = [];
+                basePrice = 0;
+                $('#selectedSeat').val('');
+                $('#priceInput').val('');
+                $('#DepartureTimes').empty().append('<option value="">Select Departure Time</option>');
+                $('.seat').removeClass('selected');
+            }
+
+            function showError(message) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: message
+                });
+            }
         });
     </script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #e3f2fd;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            margin: 40px auto;
+        }
+
+        h2 {
+            color: #0d6efd;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .bus-layout {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .seat-row {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .aisle {
+            width: 20px;
+        }
+
+        .seat {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border: 2px solid #0d6efd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .seat:hover {
+                background: #e9ecef;
+            }
+
+            .seat.selected {
+                background: #28a745 !important;
+                color: white;
+            }
+
+            .seat.occupied {
+                background: #dc3545 !important;
+                color: white;
+                cursor: not-allowed;
+            }
+
+        .btn {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .price-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+        .seat-counter {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+    </style>
 }
 
-}
 @if (TempData["SuccessMessage"] != null)
 {
     <div class="alert alert-success mt-3">

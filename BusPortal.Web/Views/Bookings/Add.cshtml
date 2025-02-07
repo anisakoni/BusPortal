@@ -12,7 +12,7 @@
 
 <div class="container mt-5">
     <h2>Create New Booking</h2>
-    <form asp-action="Add" method="post">
+    <form class ="addForm" asp-action="Add" method="post">
         <div class="form-group mb-3">
             <label asp-for="StartCity">Start City</label>
             <select asp-for="StartCity"
@@ -283,7 +283,7 @@
             });
 
             // Validate and Submit Form
-            $('form').submit(function (e) {
+            $('.addForm').submit(function (e) {
                 var dateTime = $('#DateTime').val();
                 var departureTime = $('#DepartureTimes').val();
 

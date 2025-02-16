@@ -2,11 +2,13 @@
 {
     public class Booking
     {
-        public Guid Id { get; set; }
-        public required Client Client { get; set; }
-        public required Line Line { get; set; }
+        public Guid ClientId { get; set; }
+        public Guid LineId { get; set; }
+        public Client Client { get; set; }
+        public Line Line { get; set; }
         public DateTime DateTime { get; set; }
-        public required string Seat { get; set; }
+        public string Seat { get; set; }
+        public decimal Price { get; set; }
 
     }
 }

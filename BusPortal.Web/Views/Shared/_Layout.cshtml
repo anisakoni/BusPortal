@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using Newtonsoft.Json
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -25,13 +26,27 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
-                        <li class ="nav-item">
+                        <li class="nav-item">
                             @if (Context.Request.Cookies["ClientData"] != null)
                             {
+                                var clientDataJson = Context.Request.Cookies["ClientData"];
+                                var clientData = JsonConvert.DeserializeObject<dynamic>(clientDataJson);
+
+                                @if (clientData.Admin == true)
+                                {
+                                    <form asp-controller="Clients" asp-action="Logout" method="post" class="delete-form">
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Lines" asp-action="List">Admin panel</a>
+                                    </form>
+                                }
+                            }
+                        </li>
+                        <li class="nav-item" style="right:12px; position:absolute;">
+                                @if (Context.Request.Cookies["ClientData"] != null)
+                                {
                                 <form asp-controller="Clients" asp-action="Logout" method="post" class="delete-form">
                                     <button type="submit" class="btn btn-danger delete-btn">Logout</button>
                                 </form>
-                            }
+                                }
                         </li>
                     </ul>
                 </div>

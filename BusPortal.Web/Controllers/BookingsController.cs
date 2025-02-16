@@ -6,6 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using BusPortal.BLL.Domain.Models;
+using Stripe.Checkout;
+using Stripe;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using Mono.TextTemplating;
 
 namespace BusPortal.Web.Controllers
 {
@@ -13,26 +19,22 @@ namespace BusPortal.Web.Controllers
     {
         private readonly IBookingServices _bookingServices;
         private readonly ILinesService _linesService;
+        private readonly StripeSettings _stripeSettings;
 
-        public BookingsController(IBookingServices bookingServices, ILinesService linesService)
+        public BookingsController(IBookingServices bookingServices, ILinesService linesService, IOptions<StripeSettings> stripeSettings)
         {
             _bookingServices = bookingServices;
             _linesService = linesService;
+            _stripeSettings = stripeSettings.Value;
         }
-
-        public async Task<IActionResult> ViewAvailableSeats(string startCity, string destinationCity, DateTime dateTime, string seat)
+        [HttpGet]
+        public async Task<IActionResult> GetOccupiedSeats(string lineId, string dateSelected, string timeSelected)
         {
-            var line = await _linesService.GetLineByRouteAsync(startCity, destinationCity);  // Using _linesService
-            if (line == null)
-            {
-                ModelState.AddModelError("", "Selected route is not available");
-                return View();
-            }
-
-            var availableSeats = await _bookingServices.GetAvailableSeatAsync(line.Id, dateTime);
-            return View(availableSeats);
+            var availableSeats = await _bookingServices.GetOccupiedSeatsAsync(lineId, dateSelected, timeSelected);
+            return Json(availableSeats);
         }
 
+        [HttpGet]
         public async Task<IActionResult> Add()
         {
             var clientData = Request.Cookies["ClientData"];
@@ -43,12 +45,11 @@ namespace BusPortal.Web.Controllers
             var startCities = await _linesService.GetAllStartCitiesAsync();  // Using _linesService
             ViewBag.StartCities = new SelectList(startCities);
 
-            var occupiedSeats = await _bookingServices.GetOccupiedSeatsAsync();
-            ViewBag.OccupiedSeats = occupiedSeats;
 
             return View();
         }
 
+     
         [HttpGet]
         public async Task<IActionResult> GetDestinationCities(string startCity)
         {
@@ -68,45 +69,105 @@ namespace BusPortal.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(AddBookingViewModel model)
         {
+
+            return View(model);
+        }
+        public async Task<IActionResult> Success(string session_id)
+        {
+
+            if (string.IsNullOrEmpty(session_id))
+            {
+                return BadRequest("Session ID is missing.");
+            }
+
+            var service = new SessionService();
+            Session session = service.Get(session_id);
+
+        // Extract metadata
+            var price = session.Metadata.ContainsKey("price") ? session.Metadata["price"] : "Unknown";
+            var lineId = session.Metadata.ContainsKey("lineId") ? session.Metadata["lineId"] : "Unknown";
+            var departureDate = session.Metadata.ContainsKey("departureDate") ? session.Metadata["departureDate"] : "Unknown";
+            var departureTime = session.Metadata.ContainsKey("departureTime") ? session.Metadata["departureTime"] : "Unknown";
+            var seatNrs = session.Metadata.ContainsKey("seatNrs") ? session.Metadata["seatNrs"] : "Unknown";
             var clientData = Request.Cookies["ClientData"];
             if (clientData == null)
             {
                 return RedirectToAction("Index", "Home");
             }
-            if (ModelState.IsValid)
-            {
-                var line = await _linesService.GetLineByRouteAsync(model.StartCity, model.DestinationCity);  // Using _linesService
-                if (line == null)
-                {
-                    ModelState.AddModelError("", "Selected route is not available");
-                    return View(model);
-                }
+            dynamic ?clientDataParsed = JsonConvert.DeserializeObject(clientData);
+            var clientId = Guid.Parse(clientDataParsed.Id.Value);
+            var dateTime = DateTime.Parse(departureDate + " " + departureTime);
+            var parsedLineId = Guid.Parse(lineId);
+            decimal parsedPrice = decimal.Parse(price);
 
-                var result = _bookingServices.AddBooking(model, User.Identity.Name, model.Seat);
-                if (!result.Success)
-                {
-                    ModelState.AddModelError("", result.ErrorMessage);
-                    return View(model);
-                }
+            //add
+            var result = _bookingServices.AddBooking(clientId,  parsedLineId,  seatNrs,  dateTime,  parsedPrice);
+            var line =  await _linesService.GetLineByIdAsync(parsedLineId);
 
-                return RedirectToAction("Success");
-            }
+                ViewBag.success = new { clientData, price, departureDate, departureTime, seatNrs, startingCity=line.StartCity,destinationCity=line.DestinationCity };
 
-            // Reload start and destination cities if the form submission fails
-            var startCities = await _linesService.GetAllStartCitiesAsync();  // Using _linesService
-            ViewBag.StartCities = new SelectList(startCities);
-
-            if (!string.IsNullOrWhiteSpace(model.StartCity))
-            {
-                var destinationCities = await _linesService.GetDestinationCitiesForStartCityAsync(model.StartCity);  // Using _linesService
-                ViewBag.DestinationCities = new SelectList(destinationCities);
-            }
-            else
-            {
-                ViewBag.DestinationCities = new SelectList(new List<string>());
-            }
-
-            return View(model);
+            return View();
         }
+
+        public IActionResult Cancel()
+        {
+
+            return View();
+        }
+        public async Task<IActionResult> CreateCheckoutSession(string startCity, string destinationCity, decimal price, string departureDate, string departureTime, string lineId, string seatNrs)
+        {
+            try
+            {
+                var currency = "usd";
+                var successUrl = Url.Action("Success", "Bookings", null, Request.Scheme);
+                successUrl += "?session_id={CHECKOUT_SESSION_ID}";
+                var cancelUrl = Url.Action("Cancel", "Bookings", null, Request.Scheme);
+                StripeConfiguration.ApiKey = _stripeSettings.SecretKey;
+
+                var options = new SessionCreateOptions
+                {
+                    PaymentMethodTypes = new List<string> { "card" },
+                    LineItems = new List<SessionLineItemOptions>
+            {
+                new SessionLineItemOptions
+                {
+                    PriceData = new SessionLineItemPriceDataOptions
+                    {
+                        Currency = currency,
+                        UnitAmount = (long)(price * 100),
+                        ProductData = new SessionLineItemPriceDataProductDataOptions
+                        {
+                            Name = $"Bus Ticket from {startCity} to {destinationCity}"
+                        }
+                    },
+                    Quantity = 1
+                }
+            },
+                    Mode = "payment",
+                    SuccessUrl = successUrl,
+                    CancelUrl = cancelUrl,
+                    Metadata = new Dictionary<string, string>
+                        {
+                            { "startCity", startCity},
+                            { "destinationCity", destinationCity },
+                            { "price", price.ToString()},
+                            { "departureDate", departureDate },
+                            { "departureTime", departureTime },
+                            { "lineId", lineId },
+                            { "seatNrs", seatNrs}
+                        }
+                };
+
+                var service = new SessionService();
+                var session = service.Create(options);
+
+                return Redirect(session.Url);
+            }
+            catch (Exception ex)
+            {
+                return RedirectToAction("Error");
+            }
+        }
+
     }
 }

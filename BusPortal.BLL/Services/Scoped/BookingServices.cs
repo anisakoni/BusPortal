@@ -24,46 +24,23 @@ namespace BusPortal.BLL.Services.Scoped
             _clientRepository = clientRepository;
             _lineRepository = lineRepository;
         }
-        //implementation of the logic to retrieve available seats 
-        public async Task<IEnumerable<int>> GetAvailableSeatAsync(Guid Id, DateTime dateTime)
+        
+        public async Task<List<string>> GetOccupiedSeatsAsync(string lineId, string dateSelected, string timeSelected)
         {
-            var bookings = await _bookingRepository.GetBookingsByLineAsync(Id, dateTime);
-            var availableSeats = new List<int>();
-            for (int i = 1; i <= 40; i++)
+            var datetimeParsed = DateTime.Parse(dateSelected + " " + timeSelected);
+            var lineIdParsed = Guid.Parse(lineId);
+            var bookings = await _bookingRepository.GetBookingsByLineAsync(lineIdParsed, datetimeParsed);
+            var occupiedSeats = new List<string>();
+
+            foreach (var booking in bookings)
             {
-                if (!bookings.Any(b =>int.Parse(b.Seat) == i))
-                {
-                    availableSeats.Add(i);
-                }
+                occupiedSeats.Add(booking.Seat);
             }
-            return availableSeats;
+       
+            return occupiedSeats;
         }
-         //  var bookings = await _bookingRepository.GetBookingsByLineAsync(Id, dateTime);
-         //  var availableSeats = new List<int>();
-
-            //  for (int i = 1; i <= 40; i++)
-            //   {
-
-
-
-            //    if (!bookings.Any(b => b.Seat == i))
-
-            //   {
-            //   availableSeats.Add(i);
-            //  }
-            //   }
-            //    return availableSeats;
-            //  }
-
           
-          public async Task<IEnumerable<int>> GetOccupiedSeatsAsync()
-         {
-
-            var bookings = await _bookingRepository.GetAsync();
-             var occupiedSeats = bookings.Select(b =>int.Parse(b.Seat));
-              return occupiedSeats;
-
-         }
+       
         public async Task<IEnumerable<string>> GetAvailableDepartureTimesAsync(string startCity, string destinationCity)
         {
             var booking = await _bookingRepository.GetAsync();
@@ -75,47 +52,34 @@ namespace BusPortal.BLL.Services.Scoped
         }
 
         //add seat selection system
-        public (bool Success, string? ErrorMessage) AddBooking(AddBookingViewModel viewModel, string userName, string seat)
+        public (bool Success, string? ErrorMessage) AddBooking(Guid clientId, Guid lineId, string seat, DateTime dateTime, decimal price)
         {
             try
             {
-                var client = _clientRepository.GetAll().FirstOrDefault(c => c.Name == userName);
-                if (client == null)
-
-                {
-                    return (false, "Client not found for the logged-in user.");
-
-
-                }
-                var line = _lineRepository.GetAll()
-                    .FirstOrDefault(l=>l.StartCity==viewModel.StartCity && l.DestinationCity==viewModel.DestinationCity);
-                if (line == null)
-                {
-                    return (false, "The specified route does not exist.");
-
-                }
+                var client = _clientRepository.GetById(clientId);
+                var line = _lineRepository.GetById(lineId);
                 var booking = new Booking
                 {
                     Id = Guid.NewGuid(),
                     Client = client,
                     Line = line,
-                    DateTime = viewModel.DateTime,
+                    DateTime = dateTime,
                     Seat = seat,
-                  //  Price = viewModel.Price,
+                    Price = price
                 };
-                _bookingRepository.Add(booking);
+                _bookingRepository.AddAsync(booking);
                 return (true, null);
 
             }
             catch (Exception ex)
             {
-                //Log the exception as needed
                 return (false, "An unexpected error occurred while creating the booking.");
             }
 
 
 
         }
-        
+
+ 
     }
 }

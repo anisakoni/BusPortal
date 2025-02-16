@@ -8,7 +8,6 @@
         public Line Line { get; set; }
         public DateTime DateTime { get; set; }
         public string Seat { get; set; }
-        public Payment Payment { get; set; }
         public decimal Price { get; set; }
 
     }

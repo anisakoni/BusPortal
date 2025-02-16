@@ -1,4 +1,6 @@
-﻿namespace BusPortal.Web.Models.Entities
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace BusPortal.Web.Models.Entities
 {
     public class Line
     {
@@ -6,8 +8,9 @@
         public string StartCity { get; set; }
         public string DestinationCity { get; set; }
         public string DepartureTimes { get; set; }
+
+        [Precision(18, 2)]
         public decimal Price { get; set; }
-        // public DateTime Date { get; set; }
 
 
     }

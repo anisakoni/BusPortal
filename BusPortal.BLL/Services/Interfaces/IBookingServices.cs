@@ -12,10 +12,9 @@ namespace BusPortal.BLL.Services.Interfaces
         //  (bool Success, string? ErrorMessage) AddBooking(AddBookingViewModel viewModel, string userName);
 
         //add  seat selection system
-        (bool Success, string? ErrorMessage) AddBooking(AddBookingViewModel viewModel, string userName, string seat);
+        (bool Success, string? ErrorMessage) AddBooking(Guid clientId, Guid lineId, string seat, DateTime dateTime, decimal price);
 
-        Task<IEnumerable<int>> GetAvailableSeatAsync(Guid Id, DateTime dateTime);
-        Task<IEnumerable<int>> GetOccupiedSeatsAsync();
+        Task<List<string>> GetOccupiedSeatsAsync(string Id, string dateSelected, string timeSelected);
         Task<IEnumerable<string>> GetAvailableDepartureTimesAsync(string startCity, string destinationCity);
 
 

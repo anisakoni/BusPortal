@@ -10,7 +10,6 @@ namespace BusPortal.DAL.Persistence.Repositories
 {
     public interface IBookingRepository : _IBaseRepository<Booking, Guid>
     {
-        //Task<IEnumerable<Booking>> GetUserBookingsAsync(string userId);
         Task<bool> IsSeatAvailableAsync(string startCity, string destinationCity,
             string departureTime, string seat);
         Task<bool> AddAsync(Booking booking);
@@ -28,30 +27,17 @@ namespace BusPortal.DAL.Persistence.Repositories
             _context = context;
         }
 
-        //public async Task<IEnumerable<Booking>> GetUserBookingsAsync(string userId)
-        //{
-        //    return await _context.Bookings
-        //        .Where(b => b.Client.Id = userId)
-        //        .OrderByDescending(b => b.BookingDate)
-        //        .ToListAsync();
-        //}
-
-
-     
         public async Task<IEnumerable<Booking>> GetBookingsByLineAsync(Guid Id, DateTime dateTime)
        {
             return await _context.Bookings
                .Where(b => b.Line.Id == Id && b.DateTime == dateTime)
                .ToListAsync();
         }
-
         
         public async Task<IEnumerable<Booking>> GetAsync()
         {
             return await _context.Bookings.ToListAsync();
         }
-
-
 
         public async Task<bool> IsSeatAvailableAsync(string seat)
         {
@@ -82,11 +68,10 @@ namespace BusPortal.DAL.Persistence.Repositories
         {
             try
             {
-                // Check if seat is available before adding
-                if (!await IsSeatAvailableAsync(booking.Seat))
-                {
-                    return false;
-                }
+                //if (!await IsSeatAvailableAsync(booking.Seat))
+                //{
+                //    return false;
+                //}
 
                 await _context.Bookings.AddAsync(booking);
                 await _context.SaveChangesAsync();

@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Line = BusPortal.Web.Models.Entities.Line;
+using BusPortal.DAL.Persistence.Repositories;
 
 namespace BusPortal.Web.Controllers
 {
@@ -122,5 +123,19 @@ namespace BusPortal.Web.Controllers
             await _linesService.DeleteLineAsync(id);
             return RedirectToAction("List");
         }
+
+        public async Task<IActionResult> GetLineByRoute(string startCity, string destinationCity)
+        {
+            if (string.IsNullOrEmpty(startCity) || string.IsNullOrEmpty(destinationCity))
+            {
+                return BadRequest("Start city and destination city are required.");
+            }
+
+            var line = await _linesService.GetLineByRouteAsync(startCity, destinationCity);
+          
+
+            return Ok(line);
+        }
+
     }
 }

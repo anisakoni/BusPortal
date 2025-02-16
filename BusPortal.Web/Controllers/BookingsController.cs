@@ -100,6 +100,7 @@ namespace BusPortal.Web.Controllers
             }
             dynamic ?clientDataParsed = JsonConvert.DeserializeObject(clientData);
             var clientId = Guid.Parse(clientDataParsed.Id.Value);
+
             var dateTime = DateTime.Parse(departureDate + " " + departureTime);
             var parsedLineId = Guid.Parse(lineId);
             decimal parsedPrice = decimal.Parse(price);
@@ -108,7 +109,7 @@ namespace BusPortal.Web.Controllers
             var result = _bookingServices.AddBooking(clientId,  parsedLineId,  seatNrs,  dateTime,  parsedPrice);
             var line =  await _linesService.GetLineByIdAsync(parsedLineId);
 
-                ViewBag.success = new { clientData, price, departureDate, departureTime, seatNrs, startingCity=line.StartCity,destinationCity=line.DestinationCity };
+                ViewBag.success = new { clientName= clientDataParsed.Name, price, departureDate, departureTime, seatNrs, startingCity=line.StartCity,destinationCity=line.DestinationCity };
 
             return View();
         }

@@ -57,15 +57,19 @@ namespace BusPortal.Web.Controllers
             return Json(destinationCities);
         }
 
+
         public async Task<IActionResult> GetDepartureTimes(string startCity, string destinationCity)
         {
             var line = await _linesService.GetLineByRouteAsync(startCity, destinationCity);
-            if(line != null)
+            if (line != null && !string.IsNullOrEmpty(line.DepartureTimes))
             {
-                return Json(new { departureTimes = line.DepartureTimes });
+                // Split semicolon-separated times into an array
+                var times = line.DepartureTimes.Split(';', StringSplitOptions.RemoveEmptyEntries);
+                return Json(times); // Returns JSON array like ["12:00", "13:00"]
             }
-            return Json(new { departureTimes = string.Empty });
+            return Json(Array.Empty<string>()); // Return empty array
         }
+
         [HttpPost]
         public async Task<IActionResult> Add(AddBookingViewModel model)
         {

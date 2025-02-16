@@ -248,12 +248,11 @@
                 if (startCity && destinationCity) {
                     canSelectSeats = true; // Enable seat selection
                     $.getJSON('@Url.Action("GetDepartureTimes", "Bookings")',
-                        { startCity: startCity, destinationCity: destinationCity }, function (data) {
+                        { startCity: startCity, destinationCity: destinationCity }, function (departureTimes) {
                             var departureTimesSelect = $('#DepartureTimes');
                             departureTimesSelect.empty();
-                            console.log(data);
-                            const departureTimesArray = data.departureTimes.split(";");
-                            departureTimesArray.forEach(dt => {
+
+                            departureTimes.forEach(dt => {
                                 departureTimesSelect.append(`<option value="${dt}">${dt}</option>`);
                             });
                             updateAvailableSeats();
@@ -358,6 +357,14 @@
                         icon: 'error',
                         title: 'Oops...',
                         text: 'Please select a Date and a Departure Time before proceeding.'
+                    });
+                    return;
+                }
+                if (seatNrs=="") {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Please select a seat before proceeding.'
                     });
                     return;
                 }

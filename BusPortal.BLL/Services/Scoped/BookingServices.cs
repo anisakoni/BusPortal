@@ -24,7 +24,25 @@ namespace BusPortal.BLL.Services.Scoped
             _clientRepository = clientRepository;
             _lineRepository = lineRepository;
         }
-        
+
+        public async Task<int> GetTotalBookingsAsync()
+        {
+            return await _bookingRepository.GetCountAsync();
+        }
+        public async Task<decimal> GetTotalRevenueAsync()
+        {
+            return await _bookingRepository.GetTotalRevenueAsync();
+        }
+        public async Task<Dictionary<string,int>> GetTopRoutesAsync()
+        {
+            return await _bookingRepository.GetTopRoutesAsync();
+        }
+        public async Task<Dictionary<string, int>> GetDailyBookingsAsync()
+        {
+            return await _bookingRepository.GetDailyBookingsAsync();
+        }
+
+
         public async Task<List<string>> GetOccupiedSeatsAsync(string lineId, string dateSelected, string timeSelected)
         {
             var datetimeParsed = DateTime.Parse(dateSelected + " " + timeSelected);

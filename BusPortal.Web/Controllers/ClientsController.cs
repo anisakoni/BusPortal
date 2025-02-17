@@ -174,7 +174,7 @@ namespace BusPortal.Web.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                Expires = DateTime.Now.AddMinutes(30)
+                Expires = DateTime.Now.AddDays(30)
             };
 
             Response.Cookies.Append(clientName, clientData, cookieOptions);

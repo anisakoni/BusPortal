@@ -40,7 +40,7 @@ namespace BusPortal.Web.Controllers
             var clientData = Request.Cookies["ClientData"];
             if (clientData == null)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Login", "Clients");
             }
             var startCities = await _linesService.GetAllStartCitiesAsync();  // Using _linesService
             ViewBag.StartCities = new SelectList(startCities);
